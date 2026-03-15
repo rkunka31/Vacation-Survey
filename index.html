@@ -4,30 +4,30 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
 <meta name="apple-mobile-web-app-title" content="Trip Survey">
-<meta name="theme-color" content="#0f172a">
+<meta name="theme-color" content="#6366f1">
 <title>Vacation Survey</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
 <style>
 :root {
-  --bg: #0f172a;
-  --surface: #1e293b;
-  --surface2: #263045;
-  --border: #334155;
-  --border2: #1e293b;
-  --text: #f1f5f9;
-  --text2: #94a3b8;
-  --text3: #64748b;
+  --bg: #f1f5f9;
+  --surface: #ffffff;
+  --surface2: #f8fafc;
+  --border: #e2e8f0;
+  --border2: #f1f5f9;
+  --text: #1e293b;
+  --text2: #475569;
+  --text3: #94a3b8;
   --accent: #6366f1;
-  --accent2: #818cf8;
-  --green: #22c55e;
-  --amber: #f59e0b;
+  --accent2: #4f46e5;
+  --green: #16a34a;
+  --amber: #d97706;
   --red: #ef4444;
   --orange: #f97316;
-  --teal: #14b8a6;
-  --pink: #ec4899;
+  --teal: #0d9488;
+  --pink: #db2777;
   --safe-top: env(safe-area-inset-top, 0px);
   --safe-bottom: env(safe-area-inset-bottom, 0px);
 }
@@ -123,7 +123,7 @@ body {
   margin-bottom: 10px;
 }
 .card-hover { transition: all .2s; cursor: pointer; }
-.card-hover:active { transform: scale(.98); background: var(--surface2); }
+.card-hover:active { transform: scale(.98); background: #f8fafc; }
 
 /* BUTTONS */
 .btn {
@@ -145,8 +145,8 @@ body {
 .btn:active { transform: scale(.96); }
 .btn-primary { background: var(--accent); color: #fff; }
 .btn-primary:active { background: #4f46e5; }
-.btn-secondary { background: var(--surface2); color: var(--text); border: 1px solid var(--border); }
-.btn-secondary:active { background: var(--border); }
+.btn-secondary { background: #f1f5f9; color: #1e293b; border: 1.5px solid #e2e8f0; }
+.btn-secondary:active { background: #e2e8f0; }
 .btn-danger { background: rgba(239,68,68,.15); color: var(--red); border: 1px solid rgba(239,68,68,.3); }
 .btn-success { background: rgba(34,197,94,.15); color: var(--green); border: 1px solid rgba(34,197,94,.3); }
 .btn-amber { background: rgba(245,158,11,.15); color: var(--amber); border: 1px solid rgba(245,158,11,.3); }
@@ -186,7 +186,7 @@ select.input { cursor: pointer; }
   max-height: 200px;
   overflow-y: auto;
   -webkit-overflow-scrolling: touch;
-  box-shadow: 0 8px 30px rgba(0,0,0,.4);
+  box-shadow: 0 8px 30px rgba(0,0,0,.12);
 }
 .autocomplete-item {
   padding: 12px 14px;
@@ -300,9 +300,9 @@ select.input { cursor: pointer; }
 .score-hero {
   text-align: center;
   padding: 28px 24px;
-  background: linear-gradient(135deg, rgba(99,102,241,.12), rgba(139,92,246,.08));
+  background: linear-gradient(135deg, #eef2ff, #f5f3ff);
   border-radius: 18px;
-  border: 1px solid rgba(99,102,241,.2);
+  border: 1px solid #c7d2fe;
   margin-bottom: 12px;
 }
 .score-hero .score-num {
@@ -318,7 +318,7 @@ select.input { cursor: pointer; }
 /* MODAL / SHEET */
 .sheet-bg {
   position: fixed; inset: 0; z-index: 300;
-  background: rgba(0,0,0,.6);
+  background: rgba(15,23,42,.5);
   backdrop-filter: blur(4px);
   -webkit-backdrop-filter: blur(4px);
   display: flex;
@@ -377,7 +377,7 @@ select.input { cursor: pointer; }
   font-size: 13px;
   font-weight: 500;
   white-space: nowrap;
-  box-shadow: 0 4px 24px rgba(0,0,0,.4);
+  box-shadow: 0 4px 24px rgba(0,0,0,.12);
   animation: toastIn .25s ease;
 }
 @keyframes toastIn { from { opacity:0; transform:translateY(10px); } to { opacity:1; transform:translateY(0); } }
@@ -439,14 +439,14 @@ select.input { cursor: pointer; }
 
 /* KIDS BANNER */
 .kids-banner {
-  background: linear-gradient(135deg, rgba(245,158,11,.15), rgba(251,191,36,.1));
-  border: 1px solid rgba(245,158,11,.3);
+  background: linear-gradient(135deg, #fffbeb, #fef3c7);
+  border: 1px solid #fde68a;
   border-radius: 16px;
   padding: 16px;
   text-align: center;
   margin-bottom: 14px;
 }
-.kids-banner h3 { font-family: 'Outfit', sans-serif; font-size: 17px; font-weight: 700; color: var(--amber); }
+.kids-banner h3 { font-family: 'Outfit', sans-serif; font-size: 17px; font-weight: 700; color: #92400e; }
 
 /* SECTION LABEL */
 .section-label {
