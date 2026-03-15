@@ -1,0 +1,1555 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Trip Survey">
+<meta name="theme-color" content="#0f172a">
+<title>Vacation Survey</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #0f172a;
+  --surface: #1e293b;
+  --surface2: #263045;
+  --border: #334155;
+  --border2: #1e293b;
+  --text: #f1f5f9;
+  --text2: #94a3b8;
+  --text3: #64748b;
+  --accent: #6366f1;
+  --accent2: #818cf8;
+  --green: #22c55e;
+  --amber: #f59e0b;
+  --red: #ef4444;
+  --orange: #f97316;
+  --teal: #14b8a6;
+  --pink: #ec4899;
+  --safe-top: env(safe-area-inset-top, 0px);
+  --safe-bottom: env(safe-area-inset-bottom, 0px);
+}
+* { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+html, body { height: 100%; overflow: hidden; }
+body {
+  font-family: 'DM Sans', system-ui, sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  font-size: 15px;
+  line-height: 1.5;
+  overscroll-behavior: none;
+}
+#app { height: 100%; display: flex; flex-direction: column; }
+
+/* SCROLLABLE MAIN AREA */
+.scroll-area {
+  flex: 1;
+  overflow-y: auto;
+  overflow-x: hidden;
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior: contain;
+  padding-bottom: calc(80px + var(--safe-bottom));
+}
+
+/* HEADER */
+.header {
+  padding: calc(var(--safe-top) + 12px) 20px 12px;
+  background: var(--bg);
+  border-bottom: 1px solid var(--border2);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+}
+.header-logo {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  cursor: pointer;
+}
+.header-icon {
+  width: 34px; height: 34px;
+  background: linear-gradient(135deg, #6366f1, #8b5cf6);
+  border-radius: 10px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 17px;
+}
+.header-title { font-family: 'Outfit', sans-serif; font-weight: 700; font-size: 16px; }
+.header-sub { font-size: 9px; color: var(--text3); letter-spacing: .08em; text-transform: uppercase; }
+.header-actions { display: flex; gap: 6px; }
+
+/* BOTTOM NAV */
+.bottom-nav {
+  position: fixed;
+  bottom: 0; left: 0; right: 0;
+  height: calc(60px + var(--safe-bottom));
+  padding-bottom: var(--safe-bottom);
+  background: var(--surface);
+  border-top: 1px solid var(--border);
+  display: flex;
+  z-index: 100;
+}
+.nav-item {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 3px;
+  cursor: pointer;
+  color: var(--text3);
+  font-size: 10px;
+  font-weight: 500;
+  letter-spacing: .02em;
+  transition: color .15s;
+  -webkit-tap-highlight-color: transparent;
+  padding-top: 6px;
+}
+.nav-item.active { color: var(--accent2); }
+.nav-item svg { width: 22px; height: 22px; }
+
+/* CARDS */
+.card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 18px;
+  margin-bottom: 10px;
+}
+.card-hover { transition: all .2s; cursor: pointer; }
+.card-hover:active { transform: scale(.98); background: var(--surface2); }
+
+/* BUTTONS */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 10px 18px;
+  border-radius: 10px;
+  border: none;
+  cursor: pointer;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 14px;
+  font-weight: 600;
+  transition: all .15s;
+  white-space: nowrap;
+  -webkit-tap-highlight-color: transparent;
+}
+.btn:active { transform: scale(.96); }
+.btn-primary { background: var(--accent); color: #fff; }
+.btn-primary:active { background: #4f46e5; }
+.btn-secondary { background: var(--surface2); color: var(--text); border: 1px solid var(--border); }
+.btn-secondary:active { background: var(--border); }
+.btn-danger { background: rgba(239,68,68,.15); color: var(--red); border: 1px solid rgba(239,68,68,.3); }
+.btn-success { background: rgba(34,197,94,.15); color: var(--green); border: 1px solid rgba(34,197,94,.3); }
+.btn-amber { background: rgba(245,158,11,.15); color: var(--amber); border: 1px solid rgba(245,158,11,.3); }
+.btn-full { width: 100%; }
+.btn-sm { padding: 6px 12px; font-size: 12px; border-radius: 8px; }
+
+/* FORM INPUTS */
+.field { margin-bottom: 14px; }
+.field label { display: block; font-size: 11px; font-weight: 600; color: var(--text3); text-transform: uppercase; letter-spacing: .08em; margin-bottom: 6px; }
+.input {
+  width: 100%;
+  background: var(--surface2);
+  border: 1.5px solid var(--border);
+  color: var(--text);
+  border-radius: 10px;
+  padding: 11px 14px;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 15px;
+  outline: none;
+  transition: border-color .15s;
+  -webkit-appearance: none;
+}
+.input:focus { border-color: var(--accent); }
+.input-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+textarea.input { resize: none; line-height: 1.5; }
+select.input { cursor: pointer; }
+
+/* AUTOCOMPLETE */
+.autocomplete-wrap { position: relative; }
+.autocomplete-list {
+  position: absolute; top: 100%; left: 0; right: 0; z-index: 200;
+  background: var(--surface2);
+  border: 1.5px solid var(--accent);
+  border-radius: 10px;
+  margin-top: 4px;
+  overflow: hidden;
+  max-height: 200px;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  box-shadow: 0 8px 30px rgba(0,0,0,.4);
+}
+.autocomplete-item {
+  padding: 12px 14px;
+  cursor: pointer;
+  font-size: 14px;
+  border-bottom: 1px solid var(--border2);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  transition: background .1s;
+}
+.autocomplete-item:last-child { border-bottom: none; }
+.autocomplete-item:active { background: var(--border); }
+.autocomplete-item .place-type { font-size: 11px; color: var(--text3); }
+
+/* SCORE COLORS */
+.score-exceptional { color: var(--green); }
+.score-great       { color: #16a34a; }
+.score-good        { color: var(--amber); }
+.score-fair        { color: var(--orange); }
+.score-poor        { color: var(--red); }
+.score-none        { color: var(--text3); }
+
+/* SCORE BAR */
+.score-bar-wrap { height: 5px; background: var(--border); border-radius: 3px; overflow: hidden; margin-top: 5px; }
+.score-bar { height: 5px; border-radius: 3px; transition: width .8s cubic-bezier(.4,0,.2,1); }
+
+/* PILL OPTIONS */
+.pill-list { display: flex; flex-direction: column; gap: 7px; }
+.pill {
+  display: flex; align-items: center; gap: 10px;
+  padding: 12px 14px;
+  border-radius: 12px;
+  border: 1.5px solid var(--border);
+  background: transparent;
+  color: var(--text2);
+  cursor: pointer;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 14px;
+  text-align: left;
+  width: 100%;
+  transition: all .13s;
+  -webkit-tap-highlight-color: transparent;
+}
+.pill:active { transform: scale(.98); }
+.pill.selected { border-color: var(--accent); background: rgba(99,102,241,.15); color: var(--text); font-weight: 500; }
+.pill.na { border-color: var(--border2); color: var(--text3); font-size: 12px; font-style: italic; }
+.pill.kids-pill { font-size: 16px; color: var(--text); border-radius: 14px; }
+.pill.kids-pill.selected { border-color: var(--amber); background: rgba(245,158,11,.15); }
+.pill-check {
+  width: 18px; height: 18px; border-radius: 5px;
+  border: 2px solid var(--border);
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0;
+  font-size: 10px;
+  font-weight: bold;
+  transition: all .13s;
+}
+.pill.selected .pill-check { background: var(--accent); border-color: var(--accent); color: #fff; }
+
+/* CATEGORY TABS */
+.cat-tabs {
+  display: flex;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  border-bottom: 1px solid var(--border);
+  margin-bottom: 18px;
+  scrollbar-width: none;
+  gap: 2px;
+}
+.cat-tabs::-webkit-scrollbar { display: none; }
+.cat-tab {
+  flex-shrink: 0;
+  padding: 10px 14px;
+  font-size: 20px;
+  cursor: pointer;
+  border-bottom: 2.5px solid transparent;
+  transition: all .14s;
+  -webkit-tap-highlight-color: transparent;
+}
+.cat-tab.active { border-bottom-color: var(--accent); }
+.cat-tab.done { border-bottom-color: var(--green); }
+
+/* TRAVELER CHIPS */
+.trav-chips { display: flex; flex-wrap: wrap; gap: 7px; }
+.trav-chip {
+  display: inline-flex; align-items: center; gap: 5px;
+  padding: 7px 12px;
+  border-radius: 20px;
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  border: 2px solid var(--border);
+  background: transparent;
+  color: var(--text2);
+  transition: all .14s;
+  font-family: 'DM Sans', sans-serif;
+  -webkit-tap-highlight-color: transparent;
+}
+.trav-chip.active { font-weight: 600; }
+
+/* PROGRESS */
+.progress-bar { height: 4px; background: var(--border); border-radius: 2px; overflow: hidden; }
+.progress-fill {
+  height: 4px; border-radius: 2px;
+  background: linear-gradient(90deg, #6366f1, #8b5cf6);
+  transition: width .4s;
+}
+
+/* OVERALL SCORE DISPLAY */
+.score-hero {
+  text-align: center;
+  padding: 28px 24px;
+  background: linear-gradient(135deg, rgba(99,102,241,.12), rgba(139,92,246,.08));
+  border-radius: 18px;
+  border: 1px solid rgba(99,102,241,.2);
+  margin-bottom: 12px;
+}
+.score-hero .score-num {
+  font-family: 'Outfit', sans-serif;
+  font-size: 80px;
+  font-weight: 800;
+  line-height: 1;
+  margin-bottom: 4px;
+}
+.score-hero .score-label { font-size: 20px; font-weight: 600; }
+.score-hero .score-sub { font-size: 12px; color: var(--text3); margin-top: 6px; }
+
+/* MODAL / SHEET */
+.sheet-bg {
+  position: fixed; inset: 0; z-index: 300;
+  background: rgba(0,0,0,.6);
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+}
+.sheet {
+  background: var(--surface);
+  border-radius: 24px 24px 0 0;
+  width: 100%;
+  max-width: 600px;
+  max-height: 92vh;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  padding: 0 0 calc(20px + var(--safe-bottom));
+}
+.sheet-handle {
+  width: 36px; height: 4px;
+  background: var(--border);
+  border-radius: 2px;
+  margin: 12px auto 0;
+}
+.sheet-header {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 16px 20px 0;
+  margin-bottom: 16px;
+}
+.sheet-title { font-family: 'Outfit', sans-serif; font-size: 20px; font-weight: 700; }
+.sheet-body { padding: 0 20px; }
+.close-btn {
+  width: 32px; height: 32px;
+  border-radius: 50%;
+  background: var(--surface2);
+  border: none;
+  color: var(--text2);
+  display: flex; align-items: center; justify-content: center;
+  cursor: pointer;
+  font-size: 16px;
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* TOAST */
+.toast-wrap {
+  position: fixed;
+  bottom: calc(72px + var(--safe-bottom));
+  left: 50%; transform: translateX(-50%);
+  z-index: 400;
+  pointer-events: none;
+}
+.toast {
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  color: var(--text);
+  padding: 10px 20px;
+  border-radius: 20px;
+  font-size: 13px;
+  font-weight: 500;
+  white-space: nowrap;
+  box-shadow: 0 4px 24px rgba(0,0,0,.4);
+  animation: toastIn .25s ease;
+}
+@keyframes toastIn { from { opacity:0; transform:translateY(10px); } to { opacity:1; transform:translateY(0); } }
+
+/* PAGE TITLES */
+.page-header { padding: 20px 20px 10px; }
+.page-title { font-family: 'Outfit', sans-serif; font-size: 26px; font-weight: 800; margin-bottom: 2px; }
+.page-sub { font-size: 14px; color: var(--text3); }
+
+/* MINI BARS */
+.mini-bars { display: flex; gap: 4px; align-items: flex-end; height: 20px; margin-top: 10px; }
+.mini-bar { flex: 1; border-radius: 2px; opacity: .7; min-height: 2px; }
+.mini-labels { display: flex; gap: 4px; margin-top: 3px; }
+.mini-label { flex: 1; text-align: center; font-size: 8px; color: var(--text3); }
+
+/* TRAVELER ROW */
+.trav-row {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 12px 0;
+  border-bottom: 1px solid var(--border2);
+  gap: 10px;
+  flex-wrap: wrap;
+}
+.trav-avatar {
+  width: 36px; height: 36px; border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  font-family: 'Outfit', sans-serif;
+  font-size: 14px; font-weight: 700;
+  flex-shrink: 0;
+}
+
+/* DINING CARD */
+.dining-card { background: var(--surface2); border-radius: 10px; padding: 10px 12px; margin-bottom: 7px; }
+.stars { display: flex; gap: 1px; }
+.star { font-size: 16px; cursor: pointer; -webkit-tap-highlight-color: transparent; }
+
+/* MEDIA GRID */
+.media-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-top: 10px; }
+.media-thumb {
+  aspect-ratio: 1;
+  border-radius: 10px;
+  overflow: hidden;
+  background: var(--surface2);
+  position: relative;
+  border: 1px solid var(--border);
+}
+.media-thumb img { width: 100%; height: 100%; object-fit: cover; }
+.media-del {
+  position: absolute; top: 4px; right: 4px;
+  width: 22px; height: 22px; border-radius: 50%;
+  background: rgba(0,0,0,.7);
+  border: none;
+  color: #fff;
+  font-size: 12px;
+  display: flex; align-items: center; justify-content: center;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* KIDS BANNER */
+.kids-banner {
+  background: linear-gradient(135deg, rgba(245,158,11,.15), rgba(251,191,36,.1));
+  border: 1px solid rgba(245,158,11,.3);
+  border-radius: 16px;
+  padding: 16px;
+  text-align: center;
+  margin-bottom: 14px;
+}
+.kids-banner h3 { font-family: 'Outfit', sans-serif; font-size: 17px; font-weight: 700; color: var(--amber); }
+
+/* SECTION LABEL */
+.section-label {
+  font-size: 11px; font-weight: 600;
+  color: var(--text3);
+  text-transform: uppercase;
+  letter-spacing: .1em;
+  margin-bottom: 10px;
+}
+
+/* EXPORT REPORT */
+.report-page { display: none; }
+@media print {
+  body > * { display: none; }
+  .report-page { display: block !important; font-family: 'Outfit', sans-serif; padding: 20px; }
+}
+
+/* INSIGHTS */
+.insights-body { font-size: 14px; line-height: 1.8; color: var(--text2); white-space: pre-wrap; }
+.insights-body strong { color: var(--text); font-weight: 600; }
+
+/* LINK ITEM */
+.link-item {
+  display: flex; align-items: center; gap: 10px;
+  padding: 10px 12px;
+  background: var(--surface2);
+  border-radius: 10px;
+  margin-bottom: 7px;
+}
+.link-item a { color: var(--accent2); font-size: 13px; word-break: break-all; flex: 1; }
+
+/* SURVEY TYPE BUTTONS */
+.st-btns { display: flex; gap: 5px; flex-wrap: wrap; }
+.st-btn {
+  padding: 4px 9px;
+  border-radius: 7px;
+  border: 1.5px solid var(--border);
+  background: transparent;
+  color: var(--text3);
+  font-size: 11px;
+  font-weight: 600;
+  cursor: pointer;
+  font-family: 'DM Sans', sans-serif;
+  -webkit-tap-highlight-color: transparent;
+}
+.st-btn.on { color: var(--text); }
+
+/* EMPTY STATE */
+.empty { text-align: center; padding: 60px 20px; }
+.empty-icon { font-size: 52px; margin-bottom: 14px; }
+.empty h3 { font-family: 'Outfit', sans-serif; font-size: 20px; font-weight: 700; margin-bottom: 6px; }
+.empty p { font-size: 14px; color: var(--text3); }
+
+/* BADGE */
+.badge {
+  display: inline-flex; align-items: center; justify-content: center;
+  min-width: 18px; height: 18px;
+  background: var(--accent);
+  color: #fff;
+  border-radius: 9px;
+  font-size: 10px;
+  font-weight: 700;
+  padding: 0 5px;
+}
+
+/* SCORE GUIDE */
+.score-guide { display: flex; flex-wrap: wrap; gap: 10px; }
+.score-guide-item { display: flex; align-items: center; gap: 5px; font-size: 12px; }
+.dot { width: 7px; height: 7px; border-radius: 50%; flex-shrink: 0; }
+
+/* REPORT PREVIEW OVERLAY */
+.report-overlay {
+  position: fixed; inset: 0; z-index: 500;
+  background: #f8fafc;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+}
+.report-overlay-inner { max-width: 640px; margin: 0 auto; padding: 20px; font-family: 'DM Sans', sans-serif; color: #1e293b; }
+.report-bar { background: #1e293b; color: #fff; border-radius: 12px; padding: 12px 16px; margin-bottom: 20px; display: flex; align-items: center; justify-content: space-between; gap: 10px; }
+.report-bar p { font-size: 13px; }
+.report-bar button { background: #6366f1; color: #fff; border: none; border-radius: 8px; padding: 8px 14px; font-size: 13px; font-weight: 600; cursor: pointer; white-space: nowrap; }
+.report-header { background: linear-gradient(135deg, #6366f1, #8b5cf6); border-radius: 18px; padding: 28px; color: #fff; margin-bottom: 16px; }
+.report-header h1 { font-family: 'Outfit', sans-serif; font-size: 24px; font-weight: 800; margin-bottom: 4px; }
+.report-section { background: #fff; border: 1px solid #e2e8f0; border-radius: 14px; padding: 18px; margin-bottom: 12px; }
+.report-section h3 { font-size: 11px; font-weight: 700; color: #94a3b8; text-transform: uppercase; letter-spacing: .1em; margin-bottom: 14px; }
+.report-big-score { text-align: center; padding: 24px; background: linear-gradient(135deg, #f8faff, #f5f3ff); border-radius: 14px; margin-bottom: 12px; }
+.report-big-score .num { font-family: 'Outfit', sans-serif; font-size: 72px; font-weight: 800; line-height: 1; margin-bottom: 4px; }
+.report-sbar-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 5px; }
+.report-sbar { height: 6px; background: #f1f5f9; border-radius: 3px; margin-bottom: 12px; }
+.report-sbar-fill { height: 6px; border-radius: 3px; }
+</style>
+</head>
+<body>
+<div id="app">
+  <div class="header" id="mainHeader">
+    <div class="header-logo" onclick="App.goHome()">
+      <div class="header-icon">✈</div>
+      <div><div class="header-title">Vacation Survey</div><div class="header-sub">Rob's Trip Ratings</div></div>
+    </div>
+    <div class="header-actions" id="headerActions"></div>
+  </div>
+  <div class="scroll-area" id="scrollArea"></div>
+  <nav class="bottom-nav" id="bottomNav">
+    <div class="nav-item active" id="nav-catalog" onclick="App.setView('catalog')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+      Catalog
+    </div>
+    <div class="nav-item" id="nav-insights" onclick="App.setView('insights')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+      Insights
+    </div>
+    <div class="nav-item" id="nav-export" onclick="App.setView('export')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+      Export
+    </div>
+  </nav>
+</div>
+
+<!-- TOAST -->
+<div class="toast-wrap" id="toastWrap" style="display:none"><div class="toast" id="toastMsg"></div></div>
+
+<script>
+// ─── DATA ─────────────────────────────────────────────────────────────────────
+const SK = 'vs8';
+const DB = { load(){ try{return JSON.parse(localStorage.getItem(SK)||'{}')}catch{return{}} }, save(d){try{localStorage.setItem(SK,JSON.stringify(d))}catch{}} };
+
+const CATS = [
+  {id:'travel',label:'Getting There',icon:'✈'},
+  {id:'accommodation',label:'Accommodation',icon:'🏨'},
+  {id:'food',label:'Food & Drink',icon:'🍽'},
+  {id:'activities',label:'Activities',icon:'🎯'},
+  {id:'weather',label:'Weather',icon:'☀'},
+  {id:'value',label:'Value for Money',icon:'💰'},
+  {id:'people',label:'People & Service',icon:'🤝'},
+  {id:'vibe',label:'Overall Experience',icon:'✨'},
+];
+
+const QS = [
+  {id:'t1',cat:'travel',s:true,text:'How was getting to and from the destination overall?',opts:[{l:'Easy and seamless',w:100},{l:'Manageable',w:75},{l:'Somewhat difficult',w:50},{l:'Stressful',w:25},{l:'N/A',w:null}]},
+  {id:'t2',cat:'travel',s:false,text:'How was the airport or transit experience?',opts:[{l:'Smooth — no issues',w:100},{l:'Minor delays or waits',w:75},{l:'Noticeable friction',w:50},{l:'Frustrating',w:25},{l:'N/A',w:null}]},
+  {id:'t3',cat:'travel',s:false,text:'How easy was the transfer from airport to hotel?',opts:[{l:'Seamless — included or organized',w:100},{l:'Easy but required effort',w:75},{l:'Confusing or delayed',w:50},{l:'Stressful',w:25},{l:'N/A',w:null}]},
+  {id:'t4',cat:'travel',s:false,text:'How was the total door-to-door travel time?',opts:[{l:'Under 4 hours',w:100},{l:'4–6 hours',w:75},{l:'6–9 hours',w:50},{l:'9+ hours',w:25},{l:'N/A',w:null}]},
+  {id:'a1',cat:'accommodation',s:true,text:'How was the room and resort overall?',opts:[{l:'Excellent — exceeded expectations',w:100},{l:'Good',w:75},{l:'Average',w:50},{l:'Disappointing',w:25},{l:'N/A',w:null}]},
+  {id:'a2',cat:'accommodation',s:false,text:'How was cleanliness and maintenance?',opts:[{l:'Spotless and well-maintained',w:100},{l:'Clean with minor issues',w:75},{l:'Acceptable',w:50},{l:'Below expectations',w:25},{l:'N/A',w:null}]},
+  {id:'a3',cat:'accommodation',s:false,text:'How was bed comfort and sleep quality?',opts:[{l:'Excellent every night',w:100},{l:'Good overall',w:75},{l:'Hit or miss',w:50},{l:'Poor',w:25},{l:'N/A',w:null}]},
+  {id:'a4',cat:'accommodation',s:false,text:'How were the grounds and common areas?',opts:[{l:'Beautiful and well-kept',w:100},{l:'Nice',w:75},{l:'Average',w:50},{l:'Disappointing',w:25},{l:'N/A',w:null}]},
+  {id:'a5',cat:'accommodation',s:false,text:'How was pool or beach access and quality?',opts:[{l:'Outstanding',w:100},{l:'Good',w:75},{l:'Average',w:50},{l:'Poor or overcrowded',w:25},{l:'N/A',w:null}]},
+  {id:'a6',cat:'accommodation',s:false,text:'How was the noise level?',opts:[{l:'Quiet and peaceful',w:100},{l:'Occasionally noisy but fine',w:75},{l:'Regularly disruptive',w:50},{l:'Loud and problematic',w:25},{l:'N/A',w:null}]},
+  {id:'f1',cat:'food',s:true,text:'How was the food and dining experience overall?',opts:[{l:'Excellent — memorable meals',w:100},{l:'Good, consistently enjoyable',w:75},{l:'Hit or miss',w:50},{l:'Mostly disappointing',w:25},{l:'N/A',w:null}]},
+  {id:'f2',cat:'food',s:false,text:'How was the variety of food and cuisine options?',opts:[{l:'Impressive variety',w:100},{l:'Decent variety',w:75},{l:'Limited but enough',w:50},{l:'Too repetitive',w:25},{l:'N/A',w:null}]},
+  {id:'f3',cat:'food',s:false,text:'How was the overall dining atmosphere and service?',opts:[{l:'Smooth and enjoyable',w:100},{l:'Good overall',w:75},{l:'Average or slow at times',w:50},{l:'Disorganized or poor',w:25},{l:'N/A',w:null}]},
+  {id:'f4',cat:'food',s:false,text:'How were the drinks — quality, variety, availability?',opts:[{l:'Excellent',w:100},{l:'Good',w:75},{l:'Average',w:50},{l:'Poor or limited',w:25},{l:'N/A',w:null}]},
+  {id:'f5',cat:'food',s:false,text:'How well did the food work for the whole group?',opts:[{l:'Great for everyone',w:100},{l:'Good enough',w:75},{l:'Limited but manageable',w:50},{l:'Very limited',w:25},{l:'N/A',w:null}]},
+  {id:'f6',cat:'food',s:false,text:'How was the breakfast experience?',opts:[{l:'Outstanding — great start each day',w:100},{l:'Good',w:75},{l:'Adequate',w:50},{l:'Weak or repetitive',w:25},{l:'N/A',w:null}]},
+  {id:'f7',cat:'food',s:false,text:'How were the specialty or à la carte restaurants?',opts:[{l:'Exceptional',w:100},{l:'Good',w:75},{l:'Average',w:50},{l:'Below expectations',w:25},{l:'N/A',w:null}]},
+  {id:'f8',cat:'food',s:false,text:'How were snacks, poolside, or casual eating options?',opts:[{l:'Excellent — always something good',w:100},{l:'Good',w:75},{l:'Adequate',w:50},{l:'Lacking',w:25},{l:'N/A',w:null}]},
+  {id:'ac1',cat:'activities',s:true,text:'How were the activities and entertainment overall?',opts:[{l:'Exceptional — something for everyone',w:100},{l:'Good selection',w:75},{l:'Enough to stay busy',w:50},{l:'Limited or disappointing',w:25},{l:'N/A',w:null}]},
+  {id:'ac2',cat:'activities',s:false,text:"How were the kids' activities and entertainment?",opts:[{l:'Outstanding — kids were very happy',w:100},{l:'Good',w:75},{l:'Decent',w:50},{l:'Limited or underwhelming',w:25},{l:'N/A',w:null}]},
+  {id:'ac3',cat:'activities',s:false,text:'How were adult activities or evening entertainment?',opts:[{l:'Excellent',w:100},{l:'Good',w:75},{l:'Average',w:50},{l:'Limited or unappealing',w:25},{l:'N/A',w:null}]},
+  {id:'ac4',cat:'activities',s:false,text:'How was the quality of organized activities and shows?',opts:[{l:'High quality and engaging',w:100},{l:'Good',w:75},{l:'Average',w:50},{l:'Poor or low effort',w:25},{l:'N/A',w:null}]},
+  {id:'ac5',cat:'activities',s:false,text:'How was water, beach, or outdoor access?',opts:[{l:'World-class',w:100},{l:'Very good',w:75},{l:'Average',w:50},{l:'Disappointing',w:25},{l:'N/A',w:null}]},
+  {id:'w1',cat:'weather',s:true,text:'How was the weather overall?',opts:[{l:'Perfect throughout',w:100},{l:'Mostly good',w:75},{l:'Some issues but manageable',w:50},{l:'Frequently unpleasant',w:25},{l:'N/A',w:null}]},
+  {id:'w2',cat:'weather',s:false,text:'How was sun vs. rain?',opts:[{l:'Mostly sunny, minimal rain',w:100},{l:'Good mix, no real impact',w:75},{l:'Some rain affected plans',w:50},{l:'Significant disruption',w:25},{l:'N/A',w:null}]},
+  {id:'w3',cat:'weather',s:false,text:'How was humidity or wind?',opts:[{l:'No issue',w:100},{l:'Minor but manageable',w:75},{l:'Noticeably uncomfortable',w:50},{l:'Regularly unpleasant',w:25},{l:'N/A',w:null}]},
+  {id:'v1',cat:'value',s:true,text:'How was the overall value for money?',opts:[{l:'Outstanding value',w:100},{l:'Fair value',w:75},{l:'A bit pricey for what it was',w:50},{l:'Overpriced',w:25},{l:'N/A',w:null}]},
+  {id:'v2',cat:'value',s:false,text:'How were extra or unexpected costs?',opts:[{l:'Minimal — felt truly all-in',w:100},{l:'A few extras but expected',w:75},{l:'More add-ons than expected',w:50},{l:'Felt nickel-and-dimed',w:25},{l:'N/A',w:null}]},
+  {id:'v3',cat:'value',s:false,text:'Would you spend the same amount again?',opts:[{l:'Yes, without hesitation',w:100},{l:'Probably yes with planning',w:75},{l:'Would need a better deal',w:50},{l:'Not worth what we paid',w:25},{l:'N/A',w:null}]},
+  {id:'p1',cat:'people',s:true,text:'How was the staff and service overall?',opts:[{l:'Exceptional — standout throughout',w:100},{l:'Warm and helpful',w:75},{l:'Professional but average',w:50},{l:'Indifferent or poor',w:25},{l:'N/A',w:null}]},
+  {id:'p2',cat:'people',s:false,text:'How responsive was staff to needs or issues?',opts:[{l:'Always quick and helpful',w:100},{l:'Generally good',w:75},{l:'Inconsistent',w:50},{l:'Slow or unhelpful',w:25},{l:'N/A',w:null}]},
+  {id:'p3',cat:'people',s:false,text:'How was the guest mix and overall crowd vibe?',opts:[{l:'Great crowd, perfect vibe',w:100},{l:'Fine overall',w:75},{l:'Mixed — some issues',w:50},{l:'Poor fit or very loud',w:25},{l:'N/A',w:null}]},
+  {id:'vi1',cat:'vibe',s:true,text:'Overall, how would you rate this trip?',opts:[{l:"One of the best trips I've taken",w:100},{l:'Great — really enjoyed it',w:75},{l:'Good but some disappointments',w:50},{l:'Below expectations overall',w:25},{l:'N/A',w:null}]},
+  {id:'vi2',cat:'vibe',s:false,text:'How rested and recharged did you feel by the end?',opts:[{l:'Completely recharged',w:100},{l:'Mostly rested',w:75},{l:'Okay',w:50},{l:'Still tired or stressed',w:25},{l:'N/A',w:null}]},
+  {id:'vi3',cat:'vibe',s:false,text:'How did it compare to your expectations?',opts:[{l:'Exceeded expectations',w:100},{l:'Met expectations',w:75},{l:'Slightly below',w:50},{l:'Significantly below',w:25},{l:'N/A',w:null}]},
+  {id:'vi4',cat:'vibe',s:false,text:'Would you go back or recommend it to someone like you?',opts:[{l:'Absolutely, without hesitation',w:100},{l:'Probably yes',w:75},{l:'Maybe, with caveats',w:50},{l:'No',w:25},{l:'N/A',w:null}]},
+];
+
+const KIDS_QS = [
+  {id:'k1',emoji:'🌊',text:'Did you have fun at the beach or pool?',opts:[{l:'🎉 YES! So much fun!',w:100},{l:'😊 Yeah it was good',w:75},{l:'😐 It was okay',w:50},{l:'😕 Not really',w:25}]},
+  {id:'k2',emoji:'☀️',text:'How was the sunshine and warm weather?',opts:[{l:'🌞 Loved it! So sunny!',w:100},{l:'😊 It was nice',w:75},{l:'😅 A little hot',w:50},{l:'😣 Too hot',w:25}]},
+  {id:'k3',emoji:'🍦',text:'Did you eat anything yummy or try something new?',opts:[{l:'🤩 YES! It was delicious!',w:100},{l:'😋 Ate some yummy stuff',w:75},{l:'😐 It was okay',w:50},{l:'🙅 Did not like the food',w:25}]},
+  {id:'k4',emoji:'👫',text:'Did you make any new friends?',opts:[{l:'🥳 Yes! Made a new friend!',w:100},{l:'👋 Talked to some kids',w:75},{l:'😶 Not really',w:50},{l:'🙈 Stayed close to family',w:25}]},
+  {id:'k5',emoji:'🎠',text:'What was your favourite thing you did?',opts:[{l:'🎢 Something SUPER exciting!',w:100},{l:'😁 Something really fun',w:75},{l:'🙂 Something okay',w:50},{l:'🤷 I cannot pick one',w:25}]},
+  {id:'k6',emoji:'🛏️',text:'How was your sleep — were the beds comfy?',opts:[{l:'😴 Slept GREAT every night',w:100},{l:'🙂 Pretty good',w:75},{l:'😬 Some nights were tough',w:50},{l:'😫 Did not sleep well',w:25}]},
+  {id:'k7',emoji:'🐠',text:'Did you see any cool animals or sea creatures?',opts:[{l:'🤩 Yes!! So cool!',w:100},{l:'😊 Saw some neat things',w:75},{l:'😐 A little bit',w:50},{l:'🙈 Did not see any',w:25}]},
+  {id:'k8',emoji:'🎨',text:'Were there fun kids activities or crafts?',opts:[{l:'🎉 So many fun activities!',w:100},{l:'😊 Some good ones',w:75},{l:'😐 A few things',w:50},{l:'😞 Not much to do',w:25}]},
+  {id:'k9',emoji:'🍕',text:'Was the food yummy? Did you like what you ate?',opts:[{l:'😍 LOVED the food!',w:100},{l:'😋 Most of it was good',w:75},{l:'😐 Some things were okay',w:50},{l:'🙅 Did not like the food',w:25}]},
+  {id:'k10',emoji:'💃',text:'Did you dance, sing, or go to any shows?',opts:[{l:'🕺 Yes and it was SO fun!',w:100},{l:'😊 We did some fun stuff',w:75},{l:'😐 A little',w:50},{l:'🙈 Not really',w:25}]},
+  {id:'k11',emoji:'🏖️',text:'Did you build sandcastles or play on the beach?',opts:[{l:'🏰 YES! Built the best sandcastle!',w:100},{l:'😊 Played in the sand',w:75},{l:'😐 A little bit',w:50},{l:'🌊 Did not play on the beach',w:25}]},
+  {id:'k12',emoji:'🌟',text:'What is ONE thing you want to remember forever?',opts:[{l:'🌈 Everything! It was magical!',w:100},{l:'😁 My favourite moment',w:75},{l:'🙂 Something small',w:50},{l:'🤔 I am not sure yet',w:25}]},
+  {id:'k13',emoji:'😰',text:'Was anything scary or did anything go wrong?',opts:[{l:'😊 Nope! Everything was great!',w:100},{l:'😬 A little thing but it was fine',w:75},{l:'😟 Something bothered me',w:50},{l:'😭 Something really upset me',w:25}]},
+  {id:'k14',emoji:'🍦',text:'Did you get to have ice cream or a special treat?',opts:[{l:'🍦🍦 YES! Multiple times!',w:100},{l:'😊 Once! It was good',w:75},{l:'😐 Maybe once',w:50},{l:'😢 No treats',w:25}]},
+  {id:'k15',emoji:'✈️',text:'Do you want to go back to this place someday?',opts:[{l:'🙋 YES! Let us go back NOW!',w:100},{l:'😊 Yeah I would go again',w:75},{l:'😐 Maybe...',w:50},{l:'🙅 I do not want to go back',w:25}]},
+];
+
+const TC = ['#6366f1','#f59e0b','#22c55e','#ec4899','#14b8a6','#f97316'];
+const ST = {full:{label:'Full Survey',icon:'📋',badge:'~15 min'},short:{label:'Quick Survey',icon:'⚡',badge:'~3 min'},kids:{label:'Kids Survey',icon:'🎈',badge:'~5 min'},none:{label:'No Survey',icon:'👤',badge:'Skip'}};
+const MONTHS = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+const YEARS = Array.from({length:15},(_,i)=>new Date().getFullYear()-i);
+
+// ─── SCORING ──────────────────────────────────────────────────────────────────
+function getQs(st){ return st==='short'?QS.filter(q=>q.s):st==='kids'?KIDS_QS:QS; }
+
+function scoreAnswers(ans, dl, st){
+  if(st==='kids'){
+    const vals=KIDS_QS.map(q=>{const sel=ans[q.id]||[];const ws=sel.map(l=>q.opts.find(o=>o.l===l)?.w).filter(w=>w!=null);return ws.length?ws.reduce((a,b)=>a+b,0)/ws.length:null;}).filter(v=>v!=null);
+    return{catAvg:{},overall:vals.length?vals.reduce((a,b)=>a+b,0)/vals.length:null};
+  }
+  const qs=getQs(st||'full');
+  const cS={},cC={};
+  qs.forEach(q=>{
+    const sel=ans[q.id]||[];
+    const ws=sel.filter(l=>l!=='N/A').map(l=>q.opts.find(o=>o.l===l)?.w).filter(w=>w!=null);
+    if(!ws.length)return;
+    const avg=ws.reduce((a,b)=>a+b,0)/ws.length;
+    if(!cS[q.cat]){cS[q.cat]=0;cC[q.cat]=0;}
+    cS[q.cat]+=avg;cC[q.cat]++;
+  });
+  const dr=(dl||[]).map(d=>d.rating).filter(r=>r>0);
+  if(dr.length){const da=dr.reduce((a,b)=>a+b,0)/dr.length*25;if(!cS.food){cS.food=0;cC.food=0;}cS.food+=da;cC.food++;}
+  const catAvg={};let tot=0,n=0;
+  Object.keys(cS).forEach(c=>{const a=cC[c]>0?cS[c]/cC[c]:null;catAvg[c]=a;if(a!=null){tot+=a;n++;}});
+  return{catAvg,overall:n>0?tot/n:null};
+}
+
+function groupScores(travs){
+  const sc=travs.filter(t=>t.st!=='none'&&t.st!=='kids');
+  if(!sc.length)return null;
+  const catAvg={};
+  CATS.forEach(cat=>{const vals=sc.map(t=>t.scores?.catAvg?.[cat.id]).filter(v=>v!=null);catAvg[cat.id]=vals.length?vals.reduce((a,b)=>a+b,0)/vals.length:null;});
+  const vals=Object.values(catAvg).filter(v=>v!=null);
+  return{catAvg,overall:vals.length?vals.reduce((a,b)=>a+b,0)/vals.length:null};
+}
+
+function rl(s){
+  if(s==null)return{l:'—',c:'#64748b',cls:'score-none'};
+  if(s>=90)return{l:'Exceptional',c:'#22c55e',cls:'score-exceptional'};
+  if(s>=75)return{l:'Great',c:'#16a34a',cls:'score-great'};
+  if(s>=60)return{l:'Good',c:'#f59e0b',cls:'score-good'};
+  if(s>=45)return{l:'Fair',c:'#f97316',cls:'score-fair'};
+  return{l:'Poor',c:'#ef4444',cls:'score-poor'};
+}
+
+// ─── STATE ─────────────────────────────────────────────────────────────────────
+const state = {
+  trips: [],
+  view: 'catalog',
+  // Survey session
+  editId: null,
+  meta: {dest:'',resort:'',month:'',year:new Date().getFullYear(),type:'Family',nights:'',notes:''},
+  travelers: [],
+  activeId: null,
+  catIdx: 0,
+  // UI
+  diningOpen: false,
+  mediaOpen: false,
+  mediaIdx: null,
+  scTripId: null,
+  insightsText: '',
+  insightsLoading: false,
+  draft: null,
+  // Autocomplete
+  destSuggestions: [],
+  resSuggestions: [],
+};
+
+// Load from storage
+const stored = DB.load();
+if(stored.trips) state.trips = stored.trips;
+if(stored.draft) state.draft = stored.draft;
+
+function persist(){ DB.save({trips:state.trips,draft:state.draft}); }
+
+// ─── TOAST ────────────────────────────────────────────────────────────────────
+let toastTimer;
+function toast(msg,dur=2200){
+  const w=document.getElementById('toastWrap');
+  const m=document.getElementById('toastMsg');
+  m.textContent=msg; w.style.display='flex';
+  clearTimeout(toastTimer);
+  toastTimer=setTimeout(()=>w.style.display='none',dur);
+}
+
+// ─── AUTOCOMPLETE ─────────────────────────────────────────────────────────────
+let acTimer;
+async function fetchDestinations(q){
+  if(q.length<2)return[];
+  try{
+    const r=await fetch('https://nominatim.openstreetmap.org/search?format=json&limit=5&q='+encodeURIComponent(q)+'&featuretype=city,country',{headers:{'Accept-Language':'en'}});
+    const d=await r.json();
+    return d.map(p=>({label:p.display_name.split(',').slice(0,3).join(', '),type:p.type}));
+  }catch{return[];}
+}
+
+async function fetchResorts(q){
+  if(q.length<3)return[];
+  try{
+    const r=await fetch('https://nominatim.openstreetmap.org/search?format=json&limit=6&q='+encodeURIComponent(q+' hotel resort'),{headers:{'Accept-Language':'en'}});
+    const d=await r.json();
+    return d.map(p=>({label:p.display_name.split(',').slice(0,2).join(', '),type:p.type}));
+  }catch{return[];}
+}
+
+// ─── REPORT BUILDER ───────────────────────────────────────────────────────────
+function buildReport(trip){
+  const sc=trip.groupScores;
+  const ov=rl(sc?.overall);
+  const travs=trip.travelers||[];
+  const sTravs=travs.filter(t=>t.st!=='none');
+
+  function sbar(s){
+    const r=rl(s);
+    return `<div class="report-sbar"><div class="report-sbar-fill" style="width:${s||0}%;background:${r.c}"></div></div>`;
+  }
+
+  const catRows=CATS.map(cat=>{
+    const s=sc?.catAvg?.[cat.id];const r=rl(s);
+    const note=sTravs.filter(t=>t.st!=='kids').length===1?sTravs.find(t=>t.st!=='kids')?.catNotes?.[cat.id]:'';
+    return `<div style="margin-bottom:14px">
+      <div class="report-sbar-row"><div style="display:flex;gap:8px;align-items:center"><span>${cat.icon}</span><span style="font-weight:600">${cat.label}</span></div>
+      <div style="display:flex;gap:6px;align-items:center"><span style="font-size:12px;color:#64748b">${r.l}</span><span style="font-weight:700;color:${r.c};font-size:17px">${s!=null?Math.round(s):'—'}</span></div></div>
+      ${sbar(s)}${note?`<div style="font-size:12px;color:#64748b;font-style:italic;margin-top:2px">${note}</div>`:''}
+    </div>`;
+  }).join('');
+
+  const travRows=travs.length>1?travs.map((t,i)=>{
+    const ts=t.scores?.overall;const r=rl(ts);const c=TC[i%TC.length];
+    if(t.st==='none')return `<div style="display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid #f1f5f9"><span style="font-weight:600;color:${c}">${t.name}</span><span style="font-size:12px;color:#94a3b8">No survey</span></div>`;
+    return `<div style="padding:8px 0;border-bottom:1px solid #f1f5f9"><div style="display:flex;justify-content:space-between;align-items:center"><span style="font-weight:600;color:${c}">${t.st==='kids'?'🎈 ':''}${t.name}</span><div style="display:flex;gap:5px;align-items:center"><span style="font-size:12px;color:#64748b">${r.l}</span><span style="font-weight:700;color:${r.c};font-size:16px">${ts!=null?Math.round(ts):'—'}</span></div></div>${sbar(ts)}</div>`;
+  }).join(''):'';
+
+  const dining=sTravs.filter(t=>t.st!=='kids').flatMap(t=>t.dining||[]).map(d=>`<div style="display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid #f8fafc"><span style="font-weight:500">${d.name}${d.cuisine?' — '+d.cuisine:''}</span><span style="color:#f59e0b">${'★'.repeat(d.rating||0)}${'☆'.repeat(4-(d.rating||0))}</span></div>`).join('');
+
+  const kidsSection=travs.filter(t=>t.st==='kids').map(t=>{
+    const ks=t.scores?.overall;
+    const answers=KIDS_QS.map(q=>{const sel=t.answers[q.id]||[];return sel.length?`<div style="display:flex;gap:7px;margin-bottom:4px;font-size:13px"><span>${q.emoji}</span><span style="color:#78350f">${sel[0]}</span></div>`:''}).join('');
+    return `<div style="margin-bottom:12px"><div style="font-weight:600;color:#92400e;margin-bottom:6px">🎈 ${t.name}${ks!=null?' — '+Math.round(ks)+'/100':''}</div>${answers}</div>`;
+  }).join('');
+
+  const meta=[trip.resort&&trip.dest&&trip.dest!==trip.resort&&trip.dest,trip.month&&(trip.month+' '+trip.year),trip.type,trip.nights&&(trip.nights+' nights')].filter(Boolean).join(' · ');
+
+  return `<!DOCTYPE html><html><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>${trip.resort||trip.dest||'Trip'} — Vacation Survey</title>
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700;800&family=DM+Sans:wght@400;500&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:'DM Sans',sans-serif;background:#f8fafc;color:#1e293b;padding:0;-webkit-print-color-adjust:exact;print-color-adjust:exact;}
+@media print{.noprint{display:none!important;}body{background:white;}}
+.wrap{max-width:680px;margin:0 auto;padding:20px;}
+.print-bar{background:#1e293b;color:#fff;border-radius:12px;padding:12px 16px;margin-bottom:20px;display:flex;align-items:center;justify-content:space-between;gap:10px;}
+.print-bar p{font-size:13px;flex:1;}
+.print-bar button{background:#6366f1;color:#fff;border:none;border-radius:8px;padding:8px 14px;font-size:13px;font-weight:600;cursor:pointer;white-space:nowrap;}
+.hero{background:linear-gradient(135deg,#6366f1,#7c3aed);border-radius:18px;padding:28px;color:#fff;margin-bottom:14px;}
+.hero h1{font-family:'Outfit',sans-serif;font-size:26px;font-weight:800;margin-bottom:4px;}
+.hero p{font-size:13px;opacity:.85;}
+.section{background:#fff;border:1px solid #e2e8f0;border-radius:14px;padding:18px;margin-bottom:12px;}
+.section h3{font-size:11px;font-weight:700;color:#94a3b8;text-transform:uppercase;letter-spacing:.1em;margin-bottom:14px;}
+.big-score{text-align:center;padding:24px;background:linear-gradient(135deg,#f8faff,#f5f3ff);border-radius:14px;margin-bottom:12px;}
+.big-score .num{font-family:'Outfit',sans-serif;font-size:72px;font-weight:800;line-height:1;margin-bottom:4px;}
+.report-sbar-row{display:flex;justify-content:space-between;align-items:center;margin-bottom:5px;}
+.report-sbar{height:6px;background:#f1f5f9;border-radius:3px;margin-bottom:12px;}
+.report-sbar-fill{height:6px;border-radius:3px;}
+.footer{text-align:center;font-size:11px;color:#94a3b8;margin-top:16px;padding-bottom:20px;}
+</style></head><body>
+<div class="wrap">
+<div class="print-bar noprint"><p>Open in a browser and tap <strong>Share → Print</strong> to save as PDF, or take a screenshot.</p><button onclick="window.print()">🖨️ Print / PDF</button></div>
+<div class="hero"><div style="font-size:11px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;opacity:.75;margin-bottom:8px">Vacation Survey Report</div><h1>${trip.resort||trip.dest||'Trip'}</h1><p>${meta}</p></div>
+<div class="big-score"><div style="font-size:11px;font-weight:700;color:#94a3b8;letter-spacing:.1em;text-transform:uppercase;margin-bottom:10px">${sTravs.filter(t=>t.st!=='kids').length>1?'Group Average':'Overall Rating'}</div><div class="num" style="color:${ov.c}">${sc?.overall!=null?Math.round(sc.overall):'—'}</div><div style="font-size:20px;font-weight:600;color:${ov.c}">${ov.l}</div><div style="font-size:12px;color:#94a3b8;margin-top:5px">out of 100</div></div>
+${travs.length>1?`<div class="section"><h3>By Traveler</h3>${travRows}</div>`:''}
+<div class="section"><h3>Category Breakdown</h3>${catRows}</div>
+${kidsSection?`<div class="section" style="background:#fffdf5;border-color:#fde68a"><h3 style="color:#92400e">Kids Ratings</h3>${kidsSection}</div>`:''}
+${dining?`<div class="section"><h3>Dining Log</h3>${dining}</div>`:''}
+${trip.notes?`<div class="section" style="background:#fffbeb;border-color:#fde68a"><h3 style="color:#92400e">Notes</h3><div style="font-size:14px;color:#78350f;line-height:1.7">${trip.notes}</div></div>`:''}
+<div style="background:#f8fafc;border-radius:12px;padding:14px 16px;margin-bottom:14px;">
+<div style="font-size:11px;font-weight:700;color:#94a3b8;letter-spacing:.1em;text-transform:uppercase;margin-bottom:8px">Score Guide</div>
+<div style="display:flex;flex-wrap:wrap;gap:10px">
+${[['90–100','Exceptional','#22c55e'],['75–89','Great','#16a34a'],['60–74','Good','#f59e0b'],['45–59','Fair','#f97316'],['<45','Poor','#ef4444']].map(([r,l,c])=>`<div style="display:flex;gap:5px;align-items:center"><div style="width:7px;height:7px;border-radius:50%;background:${c}"></div><span style="font-size:11px;color:#64748b">${r}</span><span style="font-size:11px;color:${c};font-weight:600">${l}</span></div>`).join('')}
+</div></div>
+<div class="footer">Vacation Survey · Rob's Trip Ratings · ${new Date().toLocaleDateString('en-CA')}</div>
+</div></body></html>`;
+}
+
+// ─── RENDER ENGINE ─────────────────────────────────────────────────────────────
+function h(tag,attrs={},children=''){
+  const a=Object.entries(attrs).map(([k,v])=>`${k}="${v}"`).join(' ');
+  return `<${tag}${a?' '+a:''}>${children}</${tag}>`;
+}
+
+function renderScore(s,size=16){
+  const r=rl(s);
+  return `<span class="${r.cls}" style="font-family:'Outfit',sans-serif;font-size:${size}px;font-weight:700">${s!=null?Math.round(s):'—'}</span>`;
+}
+
+function renderScoreBar(s,color){
+  const r=rl(s);const c=color||r.c;
+  return `<div class="score-bar-wrap"><div class="score-bar" style="width:${s||0}%;background:${c}"></div></div>`;
+}
+
+// ─── AUTOCOMPLETE COMPONENT ────────────────────────────────────────────────────
+function acHTML(id,val,placeholder,listId){
+  return `<div class="autocomplete-wrap">
+    <input class="input" id="${id}" value="${val}" placeholder="${placeholder}" oninput="App.onAC('${id}','${listId}')" autocomplete="off" autocorrect="off" autocapitalize="words">
+    <div class="autocomplete-list" id="${listId}" style="display:none"></div>
+  </div>`;
+}
+
+// ─── VIEWS ─────────────────────────────────────────────────────────────────────
+const Views = {
+
+  catalog(){
+    const trips = state.trips;
+    let html = `<div class="page-header"><div class="page-title">Your Catalog</div><div class="page-sub">${trips.length} trip${trips.length!==1?'s':''} rated</div></div><div style="padding:0 16px">`;
+
+    if(!trips.length){
+      html += `<div class="empty"><div class="empty-icon">🗺️</div><h3>No trips yet</h3><p>Rate your first trip to start building your catalog</p></div>`;
+    } else {
+      trips.forEach(trip=>{
+        const sc=trip.groupScores;const ov=sc?.overall;const r=rl(ov);
+        const travChips=trip.travelers?.length>1?trip.travelers.map((t,i)=>`<span style="font-size:11px;font-weight:600;padding:2px 8px;border-radius:20px;background:${TC[i%TC.length]}33;color:${TC[i%TC.length]}">${t.st==='kids'?'🎈':''}${t.name}${t.st!=='none'&&t.scores?.overall!=null?' '+Math.round(t.scores.overall):''}</span>`).join(''):'';
+        const bars=CATS.map(cat=>{const s=sc?.catAvg?.[cat.id];return `<div class="mini-bar" style="height:${s!=null?Math.max(2,(s/100)*20):2}px;background:${s!=null?rl(s).c:'#334155'};border-radius:2px"></div>`;}).join('');
+        const barLabels=CATS.map(cat=>`<div class="mini-label">${cat.icon}</div>`).join('');
+
+        html += `<div class="card card-hover" onclick="App.openScorecard('${trip.id}')">
+          <div style="display:flex;justify-content:space-between;align-items:flex-start">
+            <div style="flex:1;padding-right:12px">
+              <div style="font-family:'Outfit',sans-serif;font-size:18px;font-weight:700;margin-bottom:2px">${trip.resort||trip.dest||'Untitled'}</div>
+              <div style="font-size:12px;color:var(--text3);margin-bottom:${travChips?6:0}px">${[trip.resort&&trip.dest&&trip.dest!==trip.resort&&trip.dest,trip.month&&(trip.month+' '+trip.year),trip.type,trip.nights&&(trip.nights+' nights')].filter(Boolean).join(' · ')}</div>
+              ${travChips?`<div style="display:flex;flex-wrap:wrap;gap:4px">${travChips}</div>`:''}
+            </div>
+            <div style="text-align:right;flex-shrink:0">
+              <div style="font-family:'Outfit',sans-serif;font-size:38px;font-weight:800;color:${r.c};line-height:1">${ov!=null?Math.round(ov):'—'}</div>
+              <div style="font-size:12px;font-weight:600;color:${r.c}">${r.l}</div>
+            </div>
+          </div>
+          <div class="mini-bars">${bars}</div>
+          <div class="mini-labels">${barLabels}</div>
+          <div style="display:flex;gap:7px;margin-top:12px;flex-wrap:wrap">
+            <button class="btn btn-secondary btn-sm" onclick="event.stopPropagation();App.editTrip('${trip.id}')">Edit</button>
+            <button class="btn btn-success btn-sm" onclick="event.stopPropagation();App.showReport('${trip.id}')">📄 Report</button>
+            <button class="btn btn-secondary btn-sm" onclick="event.stopPropagation();App.openMedia('${trip.id}')">📷 Media${trip.media?.length?' ('+trip.media.length+')':''}</button>
+            <button class="btn btn-danger btn-sm" onclick="event.stopPropagation();App.deleteTrip('${trip.id}')">Delete</button>
+          </div>
+        </div>`;
+      });
+    }
+    html += '</div>';
+
+    document.getElementById('headerActions').innerHTML = `<button class="btn btn-primary" onclick="App.newTrip()" style="padding:8px 14px;font-size:13px">+ New</button>`;
+    return html;
+  },
+
+  setup(){
+    const m=state.meta;
+    let travHTML='';
+    state.travelers.forEach((t,i)=>{
+      const c=TC[i%TC.length];
+      const stBtns=['full','short','kids','none'].map(st=>`<button class="st-btn${t.st===st?' on':''}" style="${t.st===st?'border-color:'+c+';color:'+c+';background:'+c+'22':''}" onclick="App.setTravSt('${t.id}','${st}')">${st==='full'?'Full':st==='short'?'Quick':st==='kids'?'🎈 Kids':'Skip'}</button>`).join('');
+      travHTML += `<div class="trav-row"><div style="display:flex;align-items:center;gap:10px;flex:1">
+        <div class="trav-avatar" style="background:${c}22;border:2px solid ${c};color:${c}">${t.name[0]}</div>
+        <div><div style="font-weight:600">${t.name}</div><div style="font-size:12px;color:var(--text3)">${ST[t.st].label} · ${ST[t.st].badge}</div></div>
+      </div>
+      <div style="display:flex;gap:6px;align-items:center"><div class="st-btns">${stBtns}</div>
+      <button onclick="App.removeTrav('${t.id}')" style="background:transparent;border:none;color:var(--red);font-size:16px;cursor:pointer;padding:4px">×</button></div></div>`;
+    });
+
+    document.getElementById('headerActions').innerHTML = '';
+    return `<div class="page-header"><button class="btn btn-secondary btn-sm" onclick="App.goHome()" style="margin-bottom:12px">← Back</button>
+      <div class="page-title">New Trip</div><div class="page-sub">Enter details and add travelers</div></div>
+      <div style="padding:0 16px">
+      <div class="card">
+        <div class="section-label">Trip Details</div>
+        <div class="field"><label>Destination</label>${acHTML('inp-dest',m.dest,'e.g. Punta Cana, Dominican Republic','ac-dest')}</div>
+        <div class="field"><label>Resort / Hotel</label>${acHTML('inp-resort',m.resort,'e.g. Club Med Punta Cana','ac-resort')}</div>
+        <div class="input-row">
+          <div class="field"><label>Month</label><select class="input" onchange="App.setMeta('month',this.value)"><option value="">—</option>${MONTHS.map(mo=>`<option ${m.month===mo?'selected':''}>${mo}</option>`).join('')}</select></div>
+          <div class="field"><label>Year</label><select class="input" onchange="App.setMeta('year',this.value)">${YEARS.map(y=>`<option ${m.year==y?'selected':''}>${y}</option>`).join('')}</select></div>
+        </div>
+        <div class="input-row">
+          <div class="field"><label>Trip Type</label><select class="input" onchange="App.setMeta('type',this.value)">${['Family','Couple','Solo','Friends','Business'].map(t=>`<option ${m.type===t?'selected':''}>${t}</option>`).join('')}</select></div>
+          <div class="field"><label>Nights</label><input class="input" type="number" min="1" placeholder="7" value="${m.nights}" oninput="App.setMeta('nights',this.value)"></div>
+        </div>
+        <div class="field"><label>Notes</label><textarea class="input" rows="2" placeholder="Overall impressions or context..." oninput="App.setMeta('notes',this.value)">${m.notes}</textarea></div>
+      </div>
+
+      <div class="card" style="margin-top:10px">
+        <div class="section-label">Travelers & Survey Types</div>
+        <div style="font-size:13px;color:var(--text3);margin-bottom:12px">Each person can take Full, Quick, Kids, or no survey.</div>
+        ${travHTML}
+        <div style="display:flex;gap:8px;margin-top:${state.travelers.length?10:0}px">
+          <input class="input" id="travNameInp" placeholder="Add traveler name" style="flex:1" onkeydown="if(event.key==='Enter')App.addTrav()">
+          <button class="btn btn-secondary" onclick="App.addTrav()">+ Add</button>
+        </div>
+      </div>
+
+      <div style="display:flex;gap:10px;margin-top:14px;padding-bottom:20px">
+        <button class="btn btn-secondary" onclick="App.goHome()" style="flex:1">Cancel</button>
+        <button class="btn btn-primary" onclick="App.startSurvey()" style="flex:2">${state.travelers.filter(t=>t.st!=='none').length>0?'Start Survey →':'Save to Catalog →'}</button>
+      </div></div>`;
+  },
+
+  survey(){
+    const trav=state.travelers.find(t=>t.id===state.activeId);
+    if(!trav) return `<div style="padding:20px"><div class="card" style="text-align:center;padding:40px 20px"><div style="font-size:40px;margin-bottom:12px">⚠️</div><div style="font-family:'Outfit',sans-serif;font-size:18px;font-weight:700;margin-bottom:8px">No active traveler</div><button class="btn btn-secondary" onclick="App.goHome()">← Catalog</button></div></div>`;
+
+    const isKids=trav.st==='kids';
+    const qs=getQs(trav.st);
+    const totalAns=qs.filter(q=>(trav.answers[q.id]||[]).length>0).length;
+    const progress=qs.length>0?Math.round(totalAns/qs.length*100):0;
+    const isShort=trav.st==='short';
+
+    // Traveler chips
+    const chipRows=state.travelers.map((t,i)=>{
+      const c=TC[i%TC.length];const isAct=t.id===state.activeId;
+      return `<div class="trav-chip${isAct?' active':''}" style="${isAct?'border-color:'+c+';background:'+c+'22;color:'+c:''}opacity:${t.st==='none'?.5:1}" onclick="${t.st!=='none'?'App.switchTrav(\''+t.id+'\')'  :''}">${ST[t.st].icon} ${t.name}</div>`;
+    }).join('');
+
+    // Category tabs (adult) or page tabs (kids)
+    let tabs='';
+    if(isKids){
+      tabs=`<div class="cat-tabs">${[0,1,2].map(pi=>{const pQs=KIDS_QS.slice(pi*5,pi*5+5);const done=pQs.every(q=>(trav.answers[q.id]||[]).length>0);return `<div class="cat-tab${state.catIdx===pi?' active':done&&state.catIdx!==pi?' done':''}" style="font-size:14px;padding:10px 16px" onclick="App.setCat(${pi})">${pi===0?'🌊 Part 1':pi===1?'🐠 Part 2':'✈️ Part 3'}${done&&state.catIdx!==pi?' ✓':''}</div>`;}).join('')}</div>`;
+    } else {
+      tabs=`<div class="cat-tabs">${CATS.map((cat,i)=>{const cQs=qs.filter(q=>q.cat===cat.id);const done=cQs.every(q=>(trav.answers[q.id]||[]).length>0)&&cQs.length>0;return `<div class="cat-tab${state.catIdx===i?' active':done&&state.catIdx!==i?' done':''}" onclick="App.setCat(${i})">${cat.icon}${done&&state.catIdx!==i?' ✓':''}</div>`;}).join('')}</div>`;
+    }
+
+    // Questions
+    const curCat=CATS[state.catIdx];
+    const displayQs=isKids?KIDS_QS.slice(state.catIdx*5,state.catIdx*5+5):qs.filter(q=>q.cat===curCat?.id);
+
+    let qHtml='';
+    displayQs.forEach(q=>{
+      const sel=trav.answers[q.id]||[];
+      if(isKids){
+        qHtml+=`<div class="card" style="border-color:rgba(245,158,11,.3);background:rgba(245,158,11,.05);margin-bottom:10px">
+          <div style="font-size:24px;margin-bottom:6px">${q.emoji}</div>
+          <div style="font-weight:600;font-size:15px;margin-bottom:10px;line-height:1.4">${q.text}</div>
+          <div class="pill-list">${q.opts.map(opt=>`<button class="pill kids-pill${sel.includes(opt.l)?' selected':''}" onclick="App.onAnswer('${q.id}','${opt.l.replace(/'/g,"&#39;")}')">${opt.l}</button>`).join('')}</div>
+        </div>`;
+      } else {
+        qHtml+=`<div class="card" style="margin-bottom:10px">
+          <div style="font-weight:500;font-size:14px;margin-bottom:10px;line-height:1.5;color:var(--text2)">${q.text}</div>
+          <div class="pill-list">${q.opts.map(opt=>{
+            const isNA=opt.l==='N/A';const isSel=sel.includes(opt.l);
+            return `<button class="pill${isSel?' selected':''}${isNA?' na':''}" onclick="App.onAnswer('${q.id}','${opt.l.replace(/'/g,"&#39;")}')">${isNA?'N/A — skip':`<div class="pill-check">${isSel?'✓':''}</div>${opt.l}`}</button>`;
+          }).join('')}</div>
+        </div>`;
+      }
+    });
+
+    // Dining log (food cat, full survey)
+    let diningHtml='';
+    if(!isKids&&curCat?.id==='food'){
+      const dl=trav.dining||[];
+      diningHtml=`<div class="card" style="margin-bottom:10px">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">
+          <div><div class="section-label" style="margin-bottom:2px">Dining Log</div><div style="font-size:13px;color:var(--text3)">${dl.length?dl.length+' meal'+(dl.length>1?'s':''):'No meals logged'}</div></div>
+          <button class="btn btn-secondary btn-sm" onclick="App.openDining()">+ Add Meal</button>
+        </div>
+        ${dl.map((d,i)=>`<div class="dining-card"><div style="display:flex;justify-content:space-between;align-items:flex-start"><div><div style="font-weight:600;font-size:14px">${d.name}</div><div style="font-size:11px;color:var(--text3)">${[d.cuisine,d.type].filter(Boolean).join(' · ')}</div></div><div style="display:flex;gap:2px;align-items:center">${[1,2,3,4].map(n=>`<span style="color:${n<=d.rating?'#f59e0b':'#334155'};font-size:14px">★</span>`).join('')}<button onclick="App.removeDining(${i})" style="background:transparent;border:none;color:var(--red);font-size:12px;cursor:pointer;margin-left:4px">✕</button></div></div>${d.notes?`<div style="font-size:12px;color:var(--text3);margin-top:5px">${d.notes}</div>`:''}</div>`).join('')}
+      </div>`;
+    }
+
+    // Category notes
+    let notesHtml='';
+    if(!isKids){
+      const noteVal=trav.catNotes?.[curCat?.id]||'';
+      notesHtml=`<div class="card" style="margin-bottom:10px">
+        <label style="font-size:10px;font-weight:600;color:var(--text3);letter-spacing:.08em;text-transform:uppercase;display:block;margin-bottom:6px">${curCat?.icon} ${curCat?.label} — Notes</label>
+        <textarea class="input" rows="2" placeholder="Anything worth remembering..." style="border:none;background:transparent;padding:0;font-size:14px" oninput="App.setCatNote('${curCat?.id}',this.value)">${noteVal}</textarea>
+      </div>`;
+    } else {
+      const noteVal=trav.catNotes?.['kids_'+state.catIdx]||'';
+      notesHtml=`<div class="card" style="margin-bottom:10px;border-color:rgba(245,158,11,.3);background:rgba(245,158,11,.05)">
+        <label style="font-size:10px;font-weight:600;color:#f59e0b;letter-spacing:.08em;text-transform:uppercase;display:block;margin-bottom:6px">📝 Parent's Notes</label>
+        <textarea class="input" rows="2" placeholder="Any extra memories..." style="border:none;background:transparent;padding:0;font-size:14px" oninput="App.setCatNote('kids_'+${state.catIdx},this.value)">${noteVal}</textarea>
+      </div>`;
+    }
+
+    const maxCat=isKids?2:CATS.length-1;
+
+    document.getElementById('headerActions').innerHTML = `<button class="btn btn-secondary btn-sm" onclick="App.openManage()">Manage</button>`;
+
+    return `<div style="padding:0 16px">
+      ${state.draft?`<div style="background:rgba(245,158,11,.1);border:1px solid rgba(245,158,11,.3);border-radius:12px;padding:10px 14px;margin:10px 0;display:flex;align-items:center;justify-content:space-between"><span style="font-size:13px;color:var(--amber)">Draft saved ${state.draft.ts?new Date(state.draft.ts).toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'}):''}  </span><button class="btn btn-amber btn-sm" onclick="App.clearDraft()">Clear</button></div>`:''}
+
+      ${isKids?`<div class="kids-banner" style="margin-top:10px"><div style="font-size:28px;margin-bottom:5px">🎈</div><h3>Kids Survey — ${trav.name}</h3><p style="font-size:13px;color:var(--amber);margin-top:3px">Pick the emoji that fits best!</p></div>`:`<div style="margin-top:10px"></div>`}
+
+      <div class="card" style="margin-bottom:10px;padding:12px 14px">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px"><div style="font-size:11px;font-weight:600;color:var(--text3);text-transform:uppercase;letter-spacing:.08em">Completing as</div><button class="btn btn-secondary btn-sm" onclick="App.openManage()">All Travelers</button></div>
+        <div class="trav-chips">${chipRows}</div>
+      </div>
+
+      ${!isKids?`<div style="margin-bottom:8px"><span style="font-size:12px;font-weight:600;padding:4px 10px;border-radius:20px;background:${isShort?'rgba(245,158,11,.15)':'rgba(99,102,241,.15)'};color:${isShort?'var(--amber)':'var(--accent2)'}">${isShort?'⚡ Quick Survey':'📋 Full Survey'}</span></div>`:''}
+
+      <div style="margin-bottom:12px"><div style="display:flex;justify-content:space-between;margin-bottom:5px"><span style="font-size:13px;color:var(--text2)">${trav.name} · ${totalAns}/${qs.length} answered</span><span style="font-size:13px;font-weight:600;color:${isKids?'var(--amber)':'var(--accent2)'}">${progress}%</span></div>
+      <div class="progress-bar"><div class="progress-fill" style="width:${progress}%;background:${isKids?'linear-gradient(90deg,#f59e0b,#fbbf24)':'linear-gradient(90deg,#6366f1,#8b5cf6)'}"></div></div></div>
+
+      ${tabs}
+
+      ${!isKids?`<div style="margin-bottom:12px"><div style="display:flex;align-items:center;gap:8px"><span style="font-size:22px">${curCat?.icon}</span><h2 style="font-family:'Outfit',sans-serif;font-size:20px;font-weight:700">${curCat?.label}</h2></div><div style="font-size:12px;color:var(--text3)">Cat ${state.catIdx+1} of ${CATS.length} · select all that apply</div></div>`:`<h2 style="font-family:'Outfit',sans-serif;font-size:18px;font-weight:700;color:var(--amber);margin-bottom:8px">${state.catIdx===0?'Part 1: Beach, Food & Fun 🌊':state.catIdx===1?'Part 2: Sleep, Animals & Activities 🐠':'Part 3: Play, Shows & The Big Question! ✈️'}</h2>`}
+
+      ${qHtml}${diningHtml}${notesHtml}
+
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-top:10px;padding-bottom:10px;flex-wrap:wrap;gap:8px">
+        <button class="btn btn-success btn-sm" onclick="App.saveDraft()">💾 Save Progress</button>
+        <div style="display:flex;gap:8px">
+          ${state.catIdx>0?`<button class="btn btn-secondary" onclick="App.setCat(${state.catIdx-1})">← Back</button>`:''}
+          <button class="btn btn-secondary" onclick="App.publish()" style="opacity:${totalAns>0?1:.4}">↑ Save</button>
+          ${state.catIdx<maxCat?`<button class="btn btn-primary" onclick="App.setCat(${state.catIdx+1})">Next →</button>`:`<button class="btn btn-primary" onclick="App.publish()">Finish & Save →</button>`}
+        </div>
+      </div>
+    </div>`;
+  },
+
+  manage(){
+    const travs=state.travelers;
+    let rows='';
+    travs.forEach((t,i)=>{
+      const c=TC[i%TC.length];const qs=getQs(t.st);const tA=qs.filter(q=>(t.answers[q.id]||[]).length>0).length;const pct=t.st==='none'?null:Math.round(tA/qs.length*100);
+      const ts=Object.keys(t.answers||{}).length>0?scoreAnswers(t.answers,t.dining||[],t.st):null;
+      const stBtns=['full','short','kids','none'].map(st=>`<button class="st-btn${t.st===st?' on':''}" style="${t.st===st?'border-color:'+c+';color:'+c+';background:'+c+'22':''}" onclick="App.setTravSt('${t.id}','${st}')">${st==='full'?'Full':st==='short'?'Quick':st==='kids'?'🎈':'Skip'}</button>`).join('');
+      rows+=`<div class="trav-row">
+        <div style="display:flex;align-items:center;gap:10px;flex:1">
+          <div class="trav-avatar" style="background:${c}22;border:2px solid ${c};color:${c}">${t.name[0]}</div>
+          <div>
+            <div style="font-weight:600">${t.name}</div>
+            <div style="font-size:12px;color:var(--text3)">${ST[t.st].label}${pct!=null?` · <span style="color:${pct===100?'#22c55e':'#f59e0b'}">${pct}% done</span>`:''}${ts?.overall!=null?` · <span style="color:${rl(ts.overall).c};font-weight:700">${Math.round(ts.overall)}</span>`:''}</div>
+          </div>
+        </div>
+        <div style="display:flex;gap:6px;align-items:center;flex-wrap:wrap">
+          ${t.st!=='none'?`<button class="btn btn-primary btn-sm" onclick="App.switchTrav('${t.id}');App.setView('survey')">${tA===0?'Start':pct===100?'Review':'Continue'}</button>`:''}
+          <div class="st-btns">${stBtns}</div>
+          <button onclick="App.removeTrav('${t.id}')" style="background:transparent;border:none;color:var(--red);font-size:16px;cursor:pointer;padding:4px">×</button>
+        </div>
+      </div>`;
+    });
+
+    document.getElementById('headerActions').innerHTML='';
+    return `<div style="padding:0 16px">
+      <div style="margin-top:16px;margin-bottom:12px;display:flex;align-items:center;gap:10px">
+        <button class="btn btn-secondary btn-sm" onclick="App.setView('survey')">← Survey</button>
+        <h2 style="font-family:'Outfit',sans-serif;font-size:20px;font-weight:700">Manage Travelers</h2>
+      </div>
+      <div class="card">${rows}
+        <div style="display:flex;gap:8px;margin-top:${travs.length?10:0}px">
+          <input class="input" id="travNameInp" placeholder="Add traveler" style="flex:1" onkeydown="if(event.key==='Enter')App.addTrav()">
+          <button class="btn btn-secondary" onclick="App.addTrav()">+ Add</button>
+        </div>
+      </div>
+      <div style="display:flex;gap:10px;margin-top:12px">
+        <button class="btn btn-secondary" onclick="App.setView('survey')" style="flex:1">← Back</button>
+        <button class="btn btn-primary" onclick="App.publish()" style="flex:1">Save to Catalog</button>
+      </div>
+    </div>`;
+  },
+
+  scorecard(){
+    const trip=state.trips.find(t=>t.id===state.scTripId);
+    if(!trip)return Views.catalog();
+    const sc=trip.groupScores;const ov=rl(sc?.overall);
+    const travs=trip.travelers||[];const sTravs=travs.filter(t=>t.st!=='none');const kidsTravs=travs.filter(t=>t.st==='kids');
+
+    let travRows='';
+    if(travs.length>1){
+      travRows=travs.map((t,i)=>{
+        const ts=t.scores?.overall;const r=rl(ts);const c=TC[i%TC.length];const qs=getQs(t.st);const tA=qs.filter(q=>(t.answers[q.id]||[]).length>0).length;const pct=t.st==='none'?null:Math.round(tA/qs.length*100);
+        return `<div class="trav-row"><div style="display:flex;align-items:center;gap:10px;flex:1"><div class="trav-avatar" style="background:${c}22;border:2px solid ${c};color:${c}">${t.name[0]}</div><div><div style="font-weight:600">${t.st==='kids'?'🎈 ':''}${t.name}</div><div style="font-size:12px;color:var(--text3)">${ST[t.st].label}${pct!=null?` · <span style="color:${pct===100?'#22c55e':'#f59e0b'}">${pct}%</span>`:''}</div></div></div>
+        <div style="display:flex;gap:8px;align-items:center">${ts!=null?`<div style="text-align:right"><span style="font-family:'Outfit',sans-serif;font-size:18px;font-weight:700;color:${r.c}">${Math.round(ts)}</span><div style="font-size:11px;color:${r.c}">${r.l}</div></div>`:''}
+        ${t.st!=='none'?`<button class="btn btn-secondary btn-sm" onclick="App.openTraveler('${t.id}')">${tA===0?'Start':pct===100?'Review':'Continue'}</button>`:''}</div></div>`;
+      }).join('');
+    }
+
+    const catRows=CATS.map(cat=>{
+      const s=sc?.catAvg?.[cat.id];const r=rl(s);
+      const note=sTravs.filter(t=>t.st!=='kids').length===1?sTravs.find(t=>t.st!=='kids')?.catNotes?.[cat.id]:'';
+      const perTrav=sTravs.filter(t=>t.st!=='kids').length>1?`<div style="display:flex;gap:5px;flex-wrap:wrap;margin-top:3px">${sTravs.filter(t=>t.st!=='kids').map((t,i)=>{const ts2=t.scores?.catAvg?.[cat.id];const c=TC[travs.indexOf(t)%TC.length];return ts2!=null?`<span style="font-size:11px;padding:1px 7px;border-radius:20px;background:${c}22;color:${c};font-weight:600">${t.name} ${Math.round(ts2)}</span>`:'';}).join('')}</div>`:'';;
+      const diningLog=(sTravs.filter(t=>t.st!=='kids').length===1&&cat.id==='food'&&sTravs.find(t=>t.st!=='kids')?.dining?.length)?`<div style="margin-top:8px;padding-left:12px;border-left:2px solid var(--border)"><div style="font-size:10px;font-weight:600;color:var(--text3);text-transform:uppercase;letter-spacing:.08em;margin-bottom:5px">Dining Log</div>${sTravs.find(t=>t.st!=='kids').dining.map(d=>`<div style="display:flex;justify-content:space-between;margin-bottom:4px"><span style="font-size:13px;color:var(--text2)">${d.name}${d.cuisine?' · '+d.cuisine:''}</span><span style="color:var(--amber);font-size:12px">${'★'.repeat(d.rating||0)}</span></div>`).join('')}</div>`:'';
+      return `<div style="padding-bottom:14px;margin-bottom:14px;border-bottom:1px solid var(--border2)">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:5px"><div style="display:flex;gap:7px;align-items:center"><span style="font-size:15px">${cat.icon}</span><span style="font-weight:600">${cat.label}</span></div>
+        <div style="display:flex;gap:6px;align-items:center"><span style="font-size:12px;color:var(--text3)">${r.l}</span>${renderScore(s,17)}</div></div>
+        ${renderScoreBar(s)}${perTrav}${diningLog}
+        ${note?`<div style="font-size:13px;color:var(--text3);font-style:italic;margin-top:5px">${note}</div>`:''}
+      </div>`;
+    }).join('');
+
+    const kidsSection=kidsTravs.length>0?`<div class="card" style="border-color:rgba(245,158,11,.3);background:rgba(245,158,11,.05);margin-bottom:10px">
+      <div class="section-label" style="color:var(--amber)">🎈 Kids Ratings</div>
+      ${kidsTravs.map(t=>{const ks=t.scores?.overall;return `<div style="margin-bottom:12px"><div style="font-weight:600;color:var(--amber);margin-bottom:6px">${t.name}${ks!=null?' — '+Math.round(ks)+'/100':''}</div>${KIDS_QS.map(q=>{const sel=t.answers[q.id]||[];return sel.length?`<div style="display:flex;gap:7px;margin-bottom:4px;font-size:13px"><span>${q.emoji}</span><span style="color:var(--amber)">${sel[0]}</span></div>`:'';}).join('')}</div>`;}).join('')}
+    </div>`:'';;
+
+    document.getElementById('headerActions').innerHTML='';
+    return `<div style="padding:0 16px;margin-top:14px">
+      <div style="margin-bottom:12px"><button class="btn btn-secondary btn-sm" onclick="App.goHome()">← Catalog</button></div>
+      <div class="card" style="margin-bottom:10px;padding:14px 16px">
+        <div style="font-size:10px;font-weight:600;color:var(--text3);text-transform:uppercase;letter-spacing:.1em;margin-bottom:4px">Scorecard</div>
+        <h2 style="font-family:'Outfit',sans-serif;font-size:22px;font-weight:800;margin-bottom:2px">${trip.resort||trip.dest||'Trip'}</h2>
+        <div style="font-size:12px;color:var(--text3)">${[trip.resort&&trip.dest&&trip.dest!==trip.resort&&trip.dest,trip.month&&(trip.month+' '+trip.year),trip.type,trip.nights&&(trip.nights+' nights')].filter(Boolean).join(' · ')}</div>
+      </div>
+      <div class="score-hero" style="border-color:${ov.c}44">
+        <div style="font-size:11px;font-weight:600;color:var(--text3);text-transform:uppercase;letter-spacing:.1em;margin-bottom:10px">${sTravs.filter(t=>t.st!=='kids').length>1?'Group Average':'Overall Rating'}</div>
+        <div class="score-num" style="color:${ov.c}">${sc?.overall!=null?Math.round(sc.overall):'—'}</div>
+        <div class="score-label" style="color:${ov.c}">${ov.l}</div>
+        <div class="score-sub">out of 100</div>
+      </div>
+      ${travs.length>1?`<div class="card" style="margin-bottom:10px"><div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px"><div class="section-label" style="margin-bottom:0">Travelers</div><button class="btn btn-secondary btn-sm" onclick="App.editTrip('${trip.id}')">+ Add / Edit</button></div>${travRows}</div>`:''}
+      <div class="card" style="margin-bottom:10px"><div class="section-label">Category Breakdown</div>${catRows}</div>
+      ${kidsSection}
+      ${trip.media?.length?`<div class="card" style="margin-bottom:10px"><div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px"><div class="section-label" style="margin-bottom:0">Media (${trip.media.length})</div><button class="btn btn-secondary btn-sm" onclick="App.openMedia('${trip.id}')">View All</button></div><div style="display:flex;gap:8px;overflow-x:auto">${trip.media.slice(0,6).map(m=>m.type==='image'?(`<img src="${m.data}" style="width:70px;height:70px;border-radius:8px;object-fit:cover;flex-shrink:0">`):(`<div style="width:70px;height:70px;border-radius:8px;background:var(--surface2);display:flex;align-items:center;justify-content:center;font-size:22px;flex-shrink:0">${m.type==='link'?'🔗':'📎'}</div>`)).join('')}</div></div>`:''}
+      ${trip.notes?`<div class="card" style="margin-bottom:10px;background:rgba(245,158,11,.05);border-color:rgba(245,158,11,.3)"><div class="section-label" style="color:var(--amber)">Notes</div><div style="font-size:14px;color:var(--text2);line-height:1.7">${trip.notes}</div></div>`:''}
+      <div class="card" style="margin-bottom:10px">
+        <div class="section-label">Score Guide</div>
+        <div class="score-guide">${[['90–100','Exceptional','#22c55e'],['75–89','Great','#16a34a'],['60–74','Good','#f59e0b'],['45–59','Fair','#f97316'],['<45','Poor','#ef4444']].map(([r,l,c])=>`<div class="score-guide-item"><div class="dot" style="background:${c}"></div><span style="font-size:11px;color:var(--text3)">${r}</span><span style="font-size:11px;color:${c};font-weight:600">${l}</span></div>`).join('')}</div>
+      </div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap;padding-bottom:10px">
+        <button class="btn btn-secondary" onclick="App.editTrip('${trip.id}')" style="flex:1;min-width:70px">Edit</button>
+        <button class="btn btn-success" onclick="App.showReport('${trip.id}')" style="flex:1;min-width:70px">📄 Report</button>
+        <button class="btn btn-secondary" onclick="App.openMedia('${trip.id}')" style="flex:1;min-width:70px">📷 Media</button>
+        <button class="btn btn-primary" onclick="App.goHome()" style="flex:1;min-width:70px">← Home</button>
+      </div>
+    </div>`;
+  },
+
+  insights(){
+    const trips=state.trips;
+    if(!trips.length){document.getElementById('headerActions').innerHTML='';return`<div class="empty" style="margin-top:40px"><div class="empty-icon">🗺️</div><h3>No trips yet</h3><p>Rate at least one trip to unlock insights</p></div>`;}
+
+    // Category averages
+    const catRows=CATS.map(cat=>{
+      const vals=trips.map(t=>t.groupScores?.catAvg?.[cat.id]).filter(v=>v!=null);
+      const avg=vals.length?vals.reduce((a,b)=>a+b,0)/vals.length:null;
+      const r=rl(avg);
+      return `<div style="margin-bottom:12px"><div style="display:flex;justify-content:space-between;margin-bottom:4px"><div style="display:flex;gap:7px;align-items:center"><span style="font-size:14px">${cat.icon}</span><span style="font-weight:500">${cat.label}</span></div><div style="display:flex;gap:5px;align-items:center"><span style="font-size:12px;color:var(--text3)">${r.l}</span>${renderScore(avg,16)}</div></div>${renderScoreBar(avg)}</div>`;
+    }).join('');
+
+    const avgScore=(()=>{const sc=trips.filter(t=>t.groupScores?.overall!=null);return sc.length?Math.round(sc.reduce((a,b)=>a+(b.groupScores.overall||0),0)/sc.length):'—';})();
+    const bestCat=(()=>{const avgs={};CATS.forEach(cat=>{const vals=trips.map(t=>t.groupScores?.catAvg?.[cat.id]).filter(v=>v!=null);if(vals.length)avgs[cat.id]=vals.reduce((a,b)=>a+b,0)/vals.length;});const best=Object.entries(avgs).sort((a,b)=>b[1]-a[1])[0];if(!best)return'—';return CATS.find(c=>c.id===best[0])?.icon+' '+CATS.find(c=>c.id===best[0])?.label;})();
+
+    document.getElementById('headerActions').innerHTML='';
+    return `<div class="page-header"><div class="page-title">✨ Insights</div><div class="page-sub">AI travel advisor analysis</div></div>
+    <div style="padding:0 16px">
+    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-bottom:14px">
+      ${[['Trips',trips.length,'✈'],['Avg Score',avgScore,'⭐'],['Best Category',bestCat.split(' ')[0]||'—','🏆']].map(([l,v,i])=>`<div class="card" style="text-align:center;padding:14px 8px"><div style="font-size:22px;margin-bottom:3px">${i}</div><div style="font-family:'Outfit',sans-serif;font-size:20px;font-weight:800;color:var(--accent2)">${v}</div><div style="font-size:10px;color:var(--text3);margin-top:2px">${l}</div></div>`).join('')}
+    </div>
+    <div class="card" style="margin-bottom:12px"><div class="section-label">Category Averages Across All Trips</div>${catRows}</div>
+    <div class="card" style="margin-bottom:12px">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">
+        <div><div class="section-label" style="margin-bottom:2px">AI Travel Advisor</div><div style="font-size:13px;color:var(--text3)">Personalised recommendations from your data</div></div>
+        <button class="btn btn-primary btn-sm" onclick="App.loadInsights()" ${state.insightsLoading?'disabled':''} style="white-space:nowrap">${state.insightsLoading?'Analysing...':'✨ Analyse'}</button>
+      </div>
+      ${state.insightsText?`<div class="insights-body">${state.insightsText.replace(/\*\*(.*?)\*\*/g,'<strong>$1</strong>').replace(/\n- /g,'\n• ')}</div>`:`<div style="font-size:14px;color:var(--text3);text-align:center;padding:20px 0">${state.insightsLoading?'🤔 Analysing your trips...':'Tap Analyse for personalised recommendations'}</div>`}
+    </div></div>`;
+  },
+
+  export(){
+    const trips=state.trips;
+    document.getElementById('headerActions').innerHTML='';
+    return `<div class="page-header"><div class="page-title">Export & Import</div><div class="page-sub">Backup and share your data</div></div>
+    <div style="padding:0 16px">
+    <div class="card" style="margin-bottom:10px">
+      <div class="section-label">Export</div>
+      <button class="btn btn-success btn-full" onclick="App.exportJSON()" style="margin-bottom:8px;text-align:left">📦 Full Backup (JSON) — Save all data</button>
+      <button class="btn btn-secondary btn-full" onclick="App.exportCSV()" style="margin-bottom:8px;text-align:left">📊 Scores CSV — Open in Excel or Numbers</button>
+      ${trips.length?`<div style="margin-top:6px"><div class="section-label">Visual Reports</div>${trips.map(trip=>`<button class="btn btn-secondary btn-full" onclick="App.showReport('${trip.id}')" style="margin-bottom:7px;text-align:left;font-size:13px">📄 ${trip.resort||trip.dest||'Trip'} — View Report</button>`).join('')}</div>`:''}
+    </div>
+    <div class="card" style="margin-bottom:10px">
+      <div class="section-label">Import</div>
+      <input type="file" id="importFile" accept=".json" style="display:none" onchange="App.handleImport(this)">
+      <input type="file" id="mergeFile" accept=".json" style="display:none" onchange="App.handleMerge(this)">
+      <button class="btn btn-amber btn-full" onclick="document.getElementById('importFile').click()" style="margin-bottom:8px;text-align:left">🔄 Replace All Data (from backup)</button>
+      <button class="btn btn-secondary btn-full" onclick="document.getElementById('mergeFile').click()" style="text-align:left">➕ Merge Import (add new trips)</button>
+    </div>
+    <div class="card" style="background:var(--surface2);border-color:var(--border2)">
+      <div style="font-size:13px;color:var(--text3);line-height:1.7">
+        <strong style="color:var(--text2)">How to save as PDF:</strong> Tap "View Report" for any trip. When the report opens, use your browser's Share button and choose "Print" or "Save as PDF". On iPhone, tap the Share icon and select "Print", then pinch-zoom to save as PDF.
+      </div>
+    </div>
+    </div>`;
+  }
+};
+
+// ─── SHEETS ────────────────────────────────────────────────────────────────────
+function openSheet(title, content, onClose){
+  let overlay = document.getElementById('sheetOverlay');
+  if(!overlay){ overlay=document.createElement('div'); overlay.id='sheetOverlay'; document.body.appendChild(overlay); }
+  overlay.className='sheet-bg';
+  overlay.innerHTML=`<div class="sheet"><div class="sheet-handle"></div><div class="sheet-header"><div class="sheet-title">${title}</div><button class="close-btn" onclick="closeSheet()">✕</button></div><div class="sheet-body" id="sheetBody">${content}</div></div>`;
+  overlay.style.display='flex';
+  overlay.onclick=e=>{ if(e.target===overlay)closeSheet(); };
+  window._sheetOnClose=onClose;
+}
+function closeSheet(){
+  const o=document.getElementById('sheetOverlay');
+  if(o)o.style.display='none';
+  if(window._sheetOnClose)window._sheetOnClose();
+}
+
+// ─── DINING SHEET ─────────────────────────────────────────────────────────────
+function diningSheetHTML(){
+  return `<div class="field"><label>Restaurant / Venue *</label><input class="input" id="dn-name" placeholder="e.g. Cilantro, Main Buffet"></div>
+    <div class="input-row">
+      <div class="field"><label>Cuisine</label><input class="input" id="dn-cuisine" placeholder="e.g. Italian"></div>
+      <div class="field"><label>Type</label><select class="input" id="dn-type"><option value="all-inclusive">All-inclusive</option><option value="resort-restaurant">Resort restaurant</option><option value="local-restaurant">Local restaurant</option><option value="street-food">Street food</option><option value="other">Other</option></select></div>
+    </div>
+    <div class="field"><label>Overall Rating</label><div class="stars" id="dn-stars">${[1,2,3,4].map(n=>`<span class="star" onclick="App.setDiningStar(${n})" data-n="${n}">★</span>`).join('')}</div></div>
+    <div class="field"><label>Notes</label><textarea class="input" id="dn-notes" rows="2" placeholder="Anything memorable..."></textarea></div>
+    <div style="display:flex;gap:10px;margin-top:10px">
+      <button class="btn btn-secondary" onclick="closeSheet()" style="flex:1">Cancel</button>
+      <button class="btn btn-primary" onclick="App.saveDining()" style="flex:2">Save Meal</button>
+    </div>`;
+}
+window._diningRating=0;
+
+// ─── MEDIA SHEET ──────────────────────────────────────────────────────────────
+function mediaSheetHTML(trip){
+  const media=trip.media||[];
+  const thumbs=media.map((m,i)=>`<div class="media-thumb">${m.type==='image'?`<img src="${m.data}" alt="">`:m.type==='link'?`<div style="padding:10px;display:flex;flex-direction:column;gap:5px;height:100%"><div style="font-size:20px">🔗</div><div style="font-size:11px;color:var(--accent2);word-break:break-all;line-height:1.3">${m.label||m.url}</div><a href="${m.url}" target="_blank" style="font-size:11px;color:var(--accent2)">Open</a></div>`:`<div style="padding:10px;display:flex;flex-direction:column;gap:5px;justify-content:center;align-items:center;height:100%"><div style="font-size:24px">📎</div><div style="font-size:10px;color:var(--text3);text-align:center;word-break:break-all">${m.name||''}</div></div>`}<button class="media-del" onclick="App.removeMedia('${trip.id}',${i})">✕</button></div>`).join('');
+  return `<input type="file" id="mediaFile" accept="image/*" multiple style="display:none" onchange="App.addMedia('${trip.id}',this)">
+    <div style="display:flex;gap:8px;margin-bottom:14px;flex-wrap:wrap">
+      <button class="btn btn-primary" onclick="document.getElementById('mediaFile').click()" style="flex:1;min-width:120px">📷 Add Photos</button>
+      <button class="btn btn-secondary" onclick="App.addLinkPrompt('${trip.id}')" style="flex:1;min-width:120px">🔗 Add Link</button>
+    </div>
+    ${!media.length?`<div style="text-align:center;padding:30px 0;color:var(--text3)"><div style="font-size:36px;margin-bottom:8px">📷</div><div>No media yet</div></div>`:`<div class="media-grid">${thumbs}</div>`}
+    <button class="btn btn-primary btn-full" onclick="closeSheet()" style="margin-top:14px">Done</button>`;
+}
+
+// ─── REPORT OVERLAY ───────────────────────────────────────────────────────────
+function showReportOverlay(html){
+  let overlay=document.getElementById('reportOverlay');
+  if(!overlay){ overlay=document.createElement('div'); overlay.id='reportOverlay'; overlay.className='report-overlay'; document.body.appendChild(overlay); }
+  overlay.innerHTML=`<div class="report-overlay-inner">
+    <div class="report-bar"><p>Tap <strong>Share → Print</strong> to save as PDF. On iPhone: Share icon → Print → pinch to zoom → PDF.</p><button onclick="document.getElementById('reportOverlay').remove()">✕ Close</button></div>
+    ${html}</div>`;
+  overlay.style.display='block';
+  overlay.scrollTop=0;
+}
+
+// ─── APP CONTROLLER ────────────────────────────────────────────────────────────
+const App = {
+  setView(v){
+    state.view=v;
+    ['catalog','insights','export'].forEach(id=>{
+      const el=document.getElementById('nav-'+id);
+      if(el)el.className='nav-item'+(v===id?' active':'');
+    });
+    document.getElementById('scrollArea').scrollTop=0;
+    this.render();
+  },
+
+  render(){
+    const v=state.view;
+    const html=Views[v]?Views[v]():'';
+    document.getElementById('scrollArea').innerHTML=html;
+    // Re-attach autocomplete values
+    if(v==='setup'){
+      const destEl=document.getElementById('inp-dest');
+      const resEl=document.getElementById('inp-resort');
+      if(destEl)destEl.value=state.meta.dest||'';
+      if(resEl)resEl.value=state.meta.resort||'';
+    }
+  },
+
+  goHome(){ this.setView('catalog'); },
+
+  newTrip(){
+    state.editId=null;
+    state.meta={dest:'',resort:'',month:'',year:new Date().getFullYear(),type:'Family',nights:'',notes:''};
+    state.travelers=[]; state.activeId=null; state.catIdx=0;
+    this.setView('setup');
+  },
+
+  editTrip(id){
+    const trip=state.trips.find(t=>t.id===id);if(!trip)return;
+    state.editId=id;
+    state.meta={dest:trip.dest||'',resort:trip.resort||'',month:trip.month||'',year:trip.year||new Date().getFullYear(),type:trip.type||'Family',nights:trip.nights||'',notes:trip.notes||''};
+    state.travelers=JSON.parse(JSON.stringify(trip.travelers||[]));
+    const fs=state.travelers.find(t=>t.st!=='none');
+    state.activeId=fs?.id||state.travelers[0]?.id||null;
+    state.catIdx=0;
+    this.setView('setup');
+  },
+
+  setMeta(k,v){ state.meta[k]=v; },
+
+  addTrav(){
+    const el=document.getElementById('travNameInp');
+    const name=el?.value?.trim();if(!name)return;
+    state.travelers.push({id:'t'+Date.now(),name,st:'full',answers:{},catNotes:{},dining:[],media:[]});
+    el.value='';this.render();
+  },
+
+  removeTrav(id){ state.travelers=state.travelers.filter(t=>t.id!==id); this.render(); },
+  setTravSt(id,st){ const t=state.travelers.find(t=>t.id===id);if(t){t.st=st;}this.render(); },
+
+  startSurvey(){
+    const fs=state.travelers.find(t=>t.st!=='none');
+    if(fs){ state.activeId=fs.id; state.catIdx=0; this.setView('survey'); }
+    else { this.publish(); }
+  },
+
+  onAnswer(qid,label){
+    const trav=state.travelers.find(t=>t.id===state.activeId);if(!trav)return;
+    if(!trav.answers)trav.answers={};
+    const sel=trav.answers[qid]||[];
+    const isKids=trav.st==='kids';
+    let next;
+    if(isKids){ next=sel.includes(label)?[]:[label]; }
+    else if(label==='N/A'){ next=sel.includes('N/A')?[]:['N/A']; }
+    else { const wo=sel.filter(l=>l!=='N/A');next=wo.includes(label)?wo.filter(l=>l!==label):[...wo,label]; }
+    trav.answers[qid]=next;
+    // Re-render just the pill
+    this.render();
+  },
+
+  setCat(i){ state.catIdx=i; this.render(); },
+
+  switchTrav(id){ state.activeId=id; state.catIdx=0; this.render(); },
+
+  setCatNote(catId,val){
+    const trav=state.travelers.find(t=>t.id===state.activeId);if(!trav)return;
+    if(!trav.catNotes)trav.catNotes={};
+    trav.catNotes[catId]=val;
+  },
+
+  saveDraft(){
+    state.draft={meta:state.meta,travelers:JSON.parse(JSON.stringify(state.travelers)),activeId:state.activeId,catIdx:state.catIdx,editId:state.editId,ts:Date.now()};
+    persist();toast('Progress saved');
+  },
+
+  clearDraft(){ state.draft=null; persist(); this.render(); },
+
+  publish(){
+    const ft=state.travelers.map(t=>({...t,scores:t.st==='none'?null:scoreAnswers(t.answers||{},t.dining||[],t.st)}));
+    const gs=groupScores(ft);
+    const id=state.editId||('trip'+Date.now());
+    const td={...state.meta,travelers:ft,groupScores:gs,id,media:[]};
+    // Preserve existing media if editing
+    if(state.editId){const ex=state.trips.find(t=>t.id===state.editId);if(ex?.media)td.media=ex.media;}
+    state.trips=state.editId?state.trips.map(t=>t.id===state.editId?td:t):[td,...state.trips];
+    state.scTripId=id;state.draft=null;persist();
+    toast('Saved to catalog');this.setView('scorecard');
+  },
+
+  deleteTrip(id){ if(!confirm('Delete this trip?'))return;state.trips=state.trips.filter(t=>t.id!==id);persist();this.render(); },
+
+  openScorecard(id){ state.scTripId=id;this.setView('scorecard'); },
+
+  openTraveler(travId){ state.activeId=travId;state.catIdx=0;this.setView('survey'); },
+
+  openManage(){ this.setView('manage'); },
+
+  // DINING
+  openDining(){
+    window._diningRating=0;
+    openSheet('Log a Meal',diningSheetHTML());
+  },
+  setDiningStar(n){
+    window._diningRating=n;
+    document.querySelectorAll('#dn-stars .star').forEach((s,i)=>s.style.color=i<n?'#f59e0b':'#334155');
+  },
+  saveDining(){
+    const name=document.getElementById('dn-name')?.value?.trim();if(!name){toast('Enter a restaurant name');return;}
+    const trav=state.travelers.find(t=>t.id===state.activeId);if(!trav)return;
+    if(!trav.dining)trav.dining=[];
+    trav.dining.push({name,cuisine:document.getElementById('dn-cuisine')?.value||'',type:document.getElementById('dn-type')?.value||'all-inclusive',rating:window._diningRating||0,notes:document.getElementById('dn-notes')?.value||''});
+    closeSheet();this.render();toast('Meal saved');
+  },
+  removeDining(idx){
+    const trav=state.travelers.find(t=>t.id===state.activeId);if(!trav||!trav.dining)return;
+    trav.dining.splice(idx,1);this.render();
+  },
+
+  // MEDIA
+  openMedia(tripId){
+    const trip=state.trips.find(t=>t.id===tripId);if(!trip)return;
+    openSheet('Trip Media',mediaSheetHTML(trip));
+  },
+  addMedia(tripId,input){
+    const trip=state.trips.find(t=>t.id===tripId);if(!trip)return;
+    if(!trip.media)trip.media=[];
+    Array.from(input.files||[]).forEach(f=>{
+      const r=new FileReader();
+      r.onload=ev=>{
+        trip.media.push({type:'image',data:ev.target.result,name:f.name});
+        persist();
+        // Re-render sheet content
+        const sb=document.getElementById('sheetBody');
+        if(sb)sb.innerHTML=mediaSheetHTML(trip);
+      };
+      r.readAsDataURL(f);
+    });
+    input.value='';
+  },
+  addLinkPrompt(tripId){
+    const url=prompt('Enter URL (hotel website, TripAdvisor, etc.):');if(!url?.trim())return;
+    const label=prompt('Label for this link (optional):','')||url;
+    const trip=state.trips.find(t=>t.id===tripId);if(!trip)return;
+    if(!trip.media)trip.media=[];
+    trip.media.push({type:'link',url:url.trim(),label:label.trim()});persist();
+    const sb=document.getElementById('sheetBody');if(sb)sb.innerHTML=mediaSheetHTML(trip);
+  },
+  removeMedia(tripId,idx){
+    const trip=state.trips.find(t=>t.id===tripId);if(!trip||!trip.media)return;
+    trip.media.splice(idx,1);persist();
+    const sb=document.getElementById('sheetBody');if(sb)sb.innerHTML=mediaSheetHTML(trip);
+  },
+
+  // AUTOCOMPLETE
+  async onAC(inputId,listId){
+    const val=document.getElementById(inputId)?.value||'';
+    if(inputId==='inp-dest') state.meta.dest=val;
+    else state.meta.resort=val;
+    clearTimeout(acTimer);
+    const list=document.getElementById(listId);if(!list)return;
+    if(val.length<2){list.style.display='none';return;}
+    acTimer=setTimeout(async()=>{
+      const fn=inputId==='inp-dest'?fetchDestinations:fetchResorts;
+      const results=await fn(val);
+      if(!results.length){list.style.display='none';return;}
+      list.innerHTML=results.map(r=>`<div class="autocomplete-item" onclick="App.selectAC('${inputId}','${r.label.replace(/'/g,"&#39;")}','${listId}')"><span>📍</span><div><div style="font-size:14px">${r.label}</div><div class="place-type">${r.type||''}</div></div></div>`).join('');
+      list.style.display='block';
+    },350);
+  },
+  selectAC(inputId,label,listId){
+    const el=document.getElementById(inputId);if(el)el.value=label;
+    const list=document.getElementById(listId);if(list)list.style.display='none';
+    if(inputId==='inp-dest') state.meta.dest=label;
+    else state.meta.resort=label;
+  },
+
+  // INSIGHTS
+  async loadInsights(){
+    if(!state.trips.length){toast('Add a trip first');return;}
+    state.insightsLoading=true;this.render();
+    try{
+      const summary=state.trips.map(t=>({name:t.resort||t.dest,overall:t.groupScores?.overall!=null?Math.round(t.groupScores.overall):null,month:t.month,year:t.year,categories:Object.fromEntries(CATS.map(c=>[c.label,t.groupScores?.catAvg?.[c.id]!=null?Math.round(t.groupScores.catAvg[c.id]):null]))}));
+      const prompt='You are a travel advisor for Rob and his family (wife Nicole, daughters Riley 4.5 and Morgan 15mo, from Mississauga Ontario). They prefer warm all-inclusive family resorts.\n\nTrip data:\n'+JSON.stringify(summary,null,2)+'\n\nWrite a brief advisor report with:\n**PATTERNS**\n- 3 bullets on high vs low ratings\n**WHAT WORKS FOR YOUR FAMILY**\n- 3 bullets\n**WATCH OUT FOR**\n- 2 bullets\n**TOP 3 RECOMMENDATIONS**\n- Specific resorts with reasoning\n**BEST TIME TO TRAVEL**\n- 1-2 sentences';
+      const res=await fetch('https://api.anthropic.com/v1/messages',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:900,messages:[{role:'user',content:prompt}]})});
+      const d=await res.json();
+      state.insightsText=d.content?.[0]?.text||'Unable to generate insights.';
+    }catch(e){state.insightsText='Could not load insights. Try again.';}
+    state.insightsLoading=false;this.render();
+  },
+
+  // EXPORT
+  showReport(tripId){
+    const trip=state.trips.find(t=>t.id===tripId);if(!trip)return;
+    const html=buildReport(trip);
+    // Open in new window/tab — works on mobile
+    const w=window.open('','_blank');
+    if(w){w.document.write(html);w.document.close();}
+    else{
+      // Fallback: create data URI and open
+      const blob=new Blob([html],{type:'text/html'});
+      const url=URL.createObjectURL(blob);
+      window.open(url,'_blank');
+      setTimeout(()=>URL.revokeObjectURL(url),10000);
+    }
+  },
+
+  exportJSON(){
+    const data=JSON.stringify({trips:state.trips,exported:new Date().toISOString()},null,2);
+    const blob=new Blob([data],{type:'application/json'});
+    const url=URL.createObjectURL(blob);
+    const a=document.createElement('a');a.href=url;a.download='vacation_backup_'+new Date().toISOString().slice(0,10)+'.json';a.click();
+    setTimeout(()=>URL.revokeObjectURL(url),5000);
+    toast('Backup downloaded');
+  },
+
+  exportCSV(){
+    const rows=[['Trip','Destination','Month','Year','Traveler','Survey','Overall',...CATS.map(c=>c.label)]];
+    state.trips.forEach(trip=>{
+      const gs=trip.groupScores;
+      rows.push([trip.resort||trip.dest||'Trip',trip.dest||'',trip.month||'',trip.year||'','GROUP','—',gs?.overall!=null?Math.round(gs.overall):'',...CATS.map(c=>gs?.catAvg?.[c.id]!=null?Math.round(gs.catAvg[c.id]):'')]);
+      (trip.travelers||[]).forEach(t=>{const ts=t.scores;rows.push([trip.resort||trip.dest||'Trip',trip.dest||'',trip.month||'',trip.year||'',t.name,ST[t.st]?.label||'',ts?.overall!=null?Math.round(ts.overall):'',...CATS.map(c=>ts?.catAvg?.[c.id]!=null?Math.round(ts.catAvg[c.id]):'')]);});
+    });
+    const csv=rows.map(r=>r.map(v=>'"'+String(v).replace(/"/g,'""')+'"').join(',')).join('\n');
+    const blob=new Blob([csv],{type:'text/csv'});
+    const url=URL.createObjectURL(blob);
+    const a=document.createElement('a');a.href=url;a.download='vacation_scores_'+new Date().toISOString().slice(0,10)+'.csv';a.click();
+    setTimeout(()=>URL.revokeObjectURL(url),5000);
+    toast('CSV downloaded');
+  },
+
+  handleImport(input){
+    const f=input.files?.[0];if(!f)return;
+    const r=new FileReader();
+    r.onload=ev=>{
+      try{const d=JSON.parse(ev.target.result);if(d.trips&&confirm('Replace all data with '+d.trips.length+' trips?')){state.trips=d.trips;persist();toast('Imported '+d.trips.length+' trips');this.render();}}catch{toast('Could not read file');}
+    };r.readAsText(f);input.value='';
+  },
+
+  handleMerge(input){
+    const f=input.files?.[0];if(!f)return;
+    const r=new FileReader();
+    r.onload=ev=>{
+      try{const d=JSON.parse(ev.target.result);if(d.trips){const ex=new Set(state.trips.map(t=>t.id));const nw=d.trips.filter(t=>!ex.has(t.id));state.trips=[...state.trips,...nw];persist();toast('Added '+nw.length+' trips');this.render();}}catch{toast('Could not read file');}
+    };r.readAsText(f);input.value='';
+  },
+};
+
+// ─── INIT ─────────────────────────────────────────────────────────────────────
+App.render();
+
+// Auto-save every 60s while in survey
+setInterval(()=>{ if(state.view==='survey'&&state.travelers.length){App.saveDraft();} },60000);
+</script>
+</body>
+</html>
