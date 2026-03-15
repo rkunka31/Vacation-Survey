@@ -917,8 +917,8 @@ const Views = {
       <div style="padding:0 16px">
       <div class="card">
         <div class="section-label">Trip Details</div>
-        <div class="field"><label>Destination</label>${acHTML('inp-dest',m.dest,'e.g. Punta Cana, Dominican Republic','ac-dest')}</div>
-        <div class="field"><label>Resort / Hotel</label>${acHTML('inp-resort',m.resort,'e.g. Club Med Punta Cana','ac-resort')}</div>
+        <div class="field"><label>Destination</label>${`<input class='input' id='inp-dest' value='${m.dest||''}' placeholder='e.g. Punta Cana, Dominican Republic' oninput="App.setMeta('dest',this.value)" autocomplete='off'>`}</div>
+        <div class="field"><label>Resort / Hotel</label>${`<input class='input' id='inp-resort' value='${m.resort||''}' placeholder='e.g. Club Med Punta Cana' oninput="App.setMeta('resort',this.value)" autocomplete='off'>`}</div>
         <div class="input-row">
           <div class="field"><label>Month</label><select class="input" onchange="App.setMeta('month',this.value)"><option value="">—</option>${MONTHS.map(mo=>`<option ${m.month===mo?'selected':''}>${mo}</option>`).join('')}</select></div>
           <div class="field"><label>Year</label><select class="input" onchange="App.setMeta('year',this.value)">${YEARS.map(y=>`<option ${m.year==y?'selected':''}>${y}</option>`).join('')}</select></div>
@@ -1358,9 +1358,9 @@ const App = {
     this.render();
   },
 
-  setCat(i){ state.catIdx=i; this.render(); },
+  setCat(i){ state.catIdx=i; this.render(); document.querySelector('.scroll-area')?.scrollTo({top:0,behavior:'smooth'}); },
 
-  switchTrav(id){ state.activeId=id; state.catIdx=0; this.render(); },
+  switchTrav(id){ state.activeId=id; state.catIdx=0; this.render(); document.querySelector('.scroll-area')?.scrollTo({top:0,behavior:'smooth'}); },
 
   setCatNote(catId,val){
     const trav=state.travelers.find(t=>t.id===state.activeId);if(!trav)return;
