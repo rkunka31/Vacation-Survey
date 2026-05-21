@@ -1,0 +1,1542 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="Cabo 2026">
+<meta name="theme-color" content="#0891b2">
+<title>Cabo 2026 🌊</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,400&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #f0f9ff;
+  --surface: #ffffff;
+  --surface2: #f8fafc;
+  --border: #bae6fd;
+  --border2: #e0f2fe;
+  --text: #0c4a6e;
+  --text2: #075985;
+  --text3: #38bdf8;
+  --primary: #0891b2;
+  --primary2: #0e7490;
+  --orange: #f97316;
+  --orange2: #ea580c;
+  --green: #16a34a;
+  --amber: #d97706;
+  --red: #ef4444;
+  --wine: #7c3aed;
+  --wine2: #6d28d9;
+  --safe-top: env(safe-area-inset-top, 0px);
+  --safe-bottom: env(safe-area-inset-bottom, 0px);
+}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;}
+html,body{height:100%;overflow:hidden;}
+body{font-family:'DM Sans',system-ui,sans-serif;background:var(--bg);color:var(--text);font-size:15px;line-height:1.5;overscroll-behavior:none;}
+#app{height:100%;display:flex;flex-direction:column;}
+
+/* SCROLL */
+.scroll-area{flex:1;overflow-y:auto;overflow-x:hidden;-webkit-overflow-scrolling:touch;overscroll-behavior:contain;padding-bottom:calc(80px + var(--safe-bottom));}
+
+/* HEADER */
+.header{padding:calc(var(--safe-top) + 12px) 20px 12px;background:var(--bg);border-bottom:1px solid var(--border2);display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100;backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);}
+.header-logo{display:flex;align-items:center;gap:10px;cursor:pointer;}
+.header-icon{width:36px;height:36px;background:linear-gradient(135deg,var(--primary),var(--orange));border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:18px;}
+.header-title{font-family:'Outfit',sans-serif;font-weight:700;font-size:16px;color:var(--text);}
+.header-sub{font-size:9px;color:var(--text3);letter-spacing:.08em;text-transform:uppercase;}
+.header-actions{display:flex;gap:6px;align-items:center;}
+
+/* BOTTOM NAV */
+.bottom-nav{position:fixed;bottom:0;left:0;right:0;height:calc(60px + var(--safe-bottom));padding-bottom:var(--safe-bottom);background:var(--surface);border-top:1px solid var(--border);display:flex;z-index:100;}
+.nav-item{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;cursor:pointer;color:var(--text3);font-size:10px;font-weight:500;letter-spacing:.02em;transition:color .15s;-webkit-tap-highlight-color:transparent;padding-top:6px;}
+.nav-item.active{color:var(--primary);}
+.nav-item svg{width:22px;height:22px;}
+.nav-item .nav-label{font-size:9px;}
+
+/* CARDS */
+.card{background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:18px;margin-bottom:10px;}
+.card-hover{transition:all .2s;cursor:pointer;}
+.card-hover:active{transform:scale(.98);background:#f8fafc;}
+
+/* BUTTONS */
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:6px;padding:10px 18px;border-radius:10px;border:none;cursor:pointer;font-family:'DM Sans',sans-serif;font-size:14px;font-weight:600;transition:all .15s;white-space:nowrap;-webkit-tap-highlight-color:transparent;}
+.btn:active{transform:scale(.96);}
+.btn-primary{background:var(--primary);color:#fff;}
+.btn-primary:active{background:var(--primary2);}
+.btn-secondary{background:#f1f5f9;color:var(--text);border:1.5px solid #e2e8f0;}
+.btn-secondary:active{background:#e2e8f0;}
+.btn-danger{background:rgba(239,68,68,.12);color:var(--red);border:1px solid rgba(239,68,68,.25);}
+.btn-success{background:rgba(22,163,74,.12);color:var(--green);border:1px solid rgba(22,163,74,.25);}
+.btn-wine{background:rgba(124,58,237,.12);color:var(--wine);border:1px solid rgba(124,58,237,.25);}
+.btn-orange{background:rgba(249,115,22,.12);color:var(--orange);border:1px solid rgba(249,115,22,.25);}
+.btn-full{width:100%;}
+.btn-sm{padding:6px 12px;font-size:12px;border-radius:8px;}
+
+/* INPUTS */
+.field{margin-bottom:14px;}
+.field label{display:block;font-size:11px;font-weight:600;color:var(--text3);text-transform:uppercase;letter-spacing:.08em;margin-bottom:6px;}
+.input{width:100%;background:var(--surface2);border:1.5px solid var(--border);color:var(--text);border-radius:10px;padding:11px 14px;font-family:'DM Sans',sans-serif;font-size:15px;outline:none;transition:border-color .15s;-webkit-appearance:none;}
+.input:focus{border-color:var(--primary);}
+.input-row{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
+.input-row3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;}
+textarea.input{resize:none;line-height:1.5;}
+select.input{cursor:pointer;}
+
+/* STARS */
+.stars-row{display:flex;gap:2px;}
+.star{font-size:20px;cursor:pointer;color:#cbd5e1;transition:color .1s;-webkit-tap-highlight-color:transparent;line-height:1;}
+.star.filled{color:#f59e0b;}
+.star.sm{font-size:14px;}
+
+/* PAGE */
+.page-header{padding:20px 20px 10px;}
+.page-title{font-family:'Outfit',sans-serif;font-size:26px;font-weight:800;margin-bottom:2px;}
+.page-sub{font-size:13px;color:var(--text3);}
+
+/* SECTION LABEL */
+.section-label{font-size:11px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.1em;margin-bottom:10px;}
+
+/* BADGES / PILLS */
+.badge{display:inline-flex;align-items:center;justify-content:center;padding:2px 8px;border-radius:20px;font-size:11px;font-weight:600;}
+.badge-blue{background:rgba(8,145,178,.12);color:var(--primary);}
+.badge-orange{background:rgba(249,115,22,.12);color:var(--orange);}
+.badge-green{background:rgba(22,163,74,.12);color:var(--green);}
+.badge-wine{background:rgba(124,58,237,.12);color:var(--wine);}
+.badge-amber{background:rgba(217,119,6,.12);color:var(--amber);}
+.badge-red{background:rgba(239,68,68,.12);color:var(--red);}
+.must-return-badge{background:linear-gradient(135deg,rgba(249,115,22,.15),rgba(234,88,12,.15));color:var(--orange);border:1px solid rgba(249,115,22,.3);padding:3px 10px;border-radius:20px;font-size:11px;font-weight:700;}
+
+/* SHEET / MODAL */
+.sheet-bg{position:fixed;inset:0;z-index:300;background:rgba(12,74,110,.5);backdrop-filter:blur(4px);-webkit-backdrop-filter:blur(4px);display:flex;align-items:flex-end;justify-content:center;}
+.sheet{background:var(--surface);border-radius:24px 24px 0 0;width:100%;max-width:620px;max-height:95vh;overflow-y:auto;-webkit-overflow-scrolling:touch;padding:0 0 calc(24px + var(--safe-bottom));}
+.sheet-handle{width:36px;height:4px;background:var(--border);border-radius:2px;margin:12px auto 0;}
+.sheet-header{display:flex;align-items:center;justify-content:space-between;padding:16px 20px 0;margin-bottom:16px;}
+.sheet-title{font-family:'Outfit',sans-serif;font-size:20px;font-weight:700;color:var(--text);}
+.sheet-body{padding:0 20px;}
+.close-btn{width:32px;height:32px;border-radius:50%;background:var(--surface2);border:none;color:var(--text2);display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:16px;}
+
+/* TOAST */
+.toast-wrap{position:fixed;bottom:calc(72px + var(--safe-bottom));left:50%;transform:translateX(-50%);z-index:400;pointer-events:none;}
+.toast{background:#0c4a6e;color:#fff;padding:10px 20px;border-radius:20px;font-size:13px;font-weight:500;white-space:nowrap;box-shadow:0 4px 24px rgba(0,0,0,.2);animation:toastIn .25s ease;}
+@keyframes toastIn{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+
+/* EMPTY STATE */
+.empty{text-align:center;padding:60px 20px;}
+.empty-icon{font-size:52px;margin-bottom:14px;}
+.empty h3{font-family:'Outfit',sans-serif;font-size:20px;font-weight:700;margin-bottom:6px;color:var(--text);}
+.empty p{font-size:14px;color:var(--text3);}
+
+/* PROGRESS BAR */
+.progress-bar{height:6px;background:var(--border);border-radius:3px;overflow:hidden;}
+.progress-fill{height:6px;border-radius:3px;background:linear-gradient(90deg,var(--primary),var(--orange));transition:width .6s;}
+
+/* SCORE BAR */
+.score-bar-wrap{height:5px;background:var(--border);border-radius:3px;overflow:hidden;margin-top:5px;}
+.score-bar{height:5px;border-radius:3px;transition:width .8s;}
+
+/* AVATAR */
+.trav-avatar{width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:'Outfit',sans-serif;font-size:13px;font-weight:700;flex-shrink:0;}
+
+/* DAY CARDS */
+.day-card{background:var(--surface);border:1.5px solid var(--border);border-radius:16px;padding:14px 16px;margin-bottom:8px;cursor:pointer;transition:all .15s;}
+.day-card:active{transform:scale(.98);}
+.day-card.today{border-color:var(--primary);background:rgba(8,145,178,.04);}
+.day-card.past{opacity:.85;}
+.day-card.future{opacity:.7;}
+
+/* MEAL CARD */
+.meal-card{background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:14px 16px;margin-bottom:8px;cursor:pointer;transition:all .15s;}
+.meal-card:active{transform:scale(.98);}
+
+/* PERSON ORDER ROW */
+.person-order-row{padding:10px 0;border-bottom:1px solid var(--border2);}
+.person-order-row:last-child{border-bottom:none;}
+.person-row-header{display:flex;align-items:center;gap:8px;margin-bottom:8px;}
+.person-row-inputs{display:flex;gap:8px;align-items:center;}
+.person-dish-input{flex:1;background:var(--bg);border:1.5px solid var(--border2);color:var(--text);border-radius:8px;padding:8px 12px;font-family:'DM Sans',sans-serif;font-size:14px;outline:none;transition:border-color .15s;}
+.person-dish-input:focus{border-color:var(--primary);}
+
+/* WINE CARD */
+.wine-card{background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:14px 16px;margin-bottom:8px;cursor:pointer;transition:all .15s;}
+.wine-card:active{transform:scale(.98);}
+
+/* RANKING ITEMS */
+.rank-item{display:flex;align-items:center;gap:12px;padding:12px 0;border-bottom:1px solid var(--border2);}
+.rank-item:last-child{border-bottom:none;}
+.rank-medal{font-size:22px;width:28px;text-align:center;flex-shrink:0;}
+.rank-num{width:28px;text-align:center;font-family:'Outfit',sans-serif;font-size:16px;font-weight:800;color:var(--text3);flex-shrink:0;}
+
+/* TOGGLE */
+.toggle-wrap{display:flex;align-items:center;gap:10px;}
+.toggle{width:44px;height:24px;border-radius:12px;background:var(--border);position:relative;cursor:pointer;transition:background .2s;flex-shrink:0;border:none;}
+.toggle.on{background:var(--orange);}
+.toggle-knob{position:absolute;top:3px;left:3px;width:18px;height:18px;border-radius:50%;background:#fff;transition:left .2s;box-shadow:0 1px 3px rgba(0,0,0,.2);}
+.toggle.on .toggle-knob{left:23px;}
+
+/* PHOTO PREVIEW */
+.photo-preview{width:100%;max-height:200px;object-fit:contain;border-radius:10px;border:1px solid var(--border);margin-top:8px;}
+.photo-placeholder{width:100%;height:100px;border-radius:10px;border:2px dashed var(--border);display:flex;align-items:center;justify-content:center;flex-direction:column;gap:6px;cursor:pointer;background:var(--bg);}
+.photo-placeholder span{font-size:28px;}
+.photo-placeholder p{font-size:12px;color:var(--text3);}
+
+/* MOOD SELECTOR */
+.mood-btns{display:flex;gap:6px;flex-wrap:wrap;}
+.mood-btn{padding:8px 12px;border-radius:10px;border:1.5px solid var(--border);background:transparent;cursor:pointer;font-size:13px;font-family:'DM Sans',sans-serif;transition:all .13s;-webkit-tap-highlight-color:transparent;}
+.mood-btn.selected{border-color:var(--primary);background:rgba(8,145,178,.1);color:var(--primary);font-weight:600;}
+
+/* REPORT */
+.report-overlay{position:fixed;inset:0;z-index:500;background:#f8fafc;overflow-y:auto;-webkit-overflow-scrolling:touch;}
+.report-inner{max-width:680px;margin:0 auto;padding:20px;font-family:'DM Sans',sans-serif;}
+
+/* STAT GRID */
+.stat-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px;}
+.stat-grid-4{display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:8px;margin-bottom:14px;}
+.stat-card{background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:14px;text-align:center;}
+.stat-num{font-family:'Outfit',sans-serif;font-size:28px;font-weight:800;color:var(--primary);line-height:1;}
+.stat-label{font-size:11px;color:var(--text3);margin-top:4px;}
+
+/* HERO BANNER */
+.trip-hero{background:linear-gradient(135deg,var(--primary),#0369a1,var(--orange));border-radius:20px;padding:24px;color:#fff;margin-bottom:14px;position:relative;overflow:hidden;}
+.trip-hero::after{content:'🌊';position:absolute;right:16px;bottom:-4px;font-size:80px;opacity:.15;}
+.trip-hero h1{font-family:'Outfit',sans-serif;font-size:28px;font-weight:800;margin-bottom:4px;}
+.trip-hero p{font-size:13px;opacity:.85;}
+.trip-hero .day-badge{display:inline-block;background:rgba(255,255,255,.2);border-radius:20px;padding:4px 12px;font-size:12px;font-weight:600;margin-top:10px;}
+
+/* TODAY PILL */
+.today-pill{background:linear-gradient(90deg,var(--primary),var(--orange));color:#fff;border-radius:20px;padding:2px 10px;font-size:11px;font-weight:700;display:inline-block;}
+
+/* ACTIVITY ROW */
+.activity-row{display:flex;align-items:flex-start;gap:10px;padding:10px 0;border-bottom:1px solid var(--border2);}
+.activity-row:last-child{border-bottom:none;}
+
+/* FILTER TABS */
+.filter-tabs{display:flex;overflow-x:auto;-webkit-overflow-scrolling:touch;gap:6px;padding:0 16px 12px;scrollbar-width:none;}
+.filter-tabs::-webkit-scrollbar{display:none;}
+.filter-tab{flex-shrink:0;padding:6px 14px;border-radius:20px;border:1.5px solid var(--border);background:transparent;color:var(--text3);font-size:13px;font-weight:500;cursor:pointer;font-family:'DM Sans',sans-serif;transition:all .13s;}
+.filter-tab.active{background:var(--primary);border-color:var(--primary);color:#fff;font-weight:600;}
+
+/* FULL SCREEN IMAGE */
+.img-overlay{position:fixed;inset:0;z-index:600;background:rgba(0,0,0,.92);display:flex;align-items:center;justify-content:center;cursor:pointer;}
+.img-overlay img{max-width:100%;max-height:100%;object-fit:contain;}
+</style>
+</head>
+<body>
+<div id="app">
+  <div class="header" id="mainHeader"></div>
+  <div class="scroll-area" id="scrollArea"></div>
+  <nav class="bottom-nav" id="bottomNav">
+    <div class="nav-item" id="nav-dashboard" onclick="App.setView('dashboard')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg>
+      <span class="nav-label">Dashboard</span>
+    </div>
+    <div class="nav-item" id="nav-days" onclick="App.setView('days')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+      <span class="nav-label">Days</span>
+    </div>
+    <div class="nav-item" id="nav-meals" onclick="App.setView('meals')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 11l19-9-9 19-2-8-8-2z"/></svg>
+      <span class="nav-label">Meals</span>
+    </div>
+    <div class="nav-item" id="nav-wine" onclick="App.setView('wine')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M8 22h8M12 22v-7M5 3h14l-3 7a4 4 0 01-8 0L5 3z"/></svg>
+      <span class="nav-label">Wine</span>
+    </div>
+    <div class="nav-item" id="nav-rankings" onclick="App.setView('rankings')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+      <span class="nav-label">Best Of</span>
+    </div>
+  </nav>
+</div>
+
+<div class="toast-wrap" id="toastWrap" style="display:none"><div class="toast" id="toastMsg"></div></div>
+
+<script>
+// ─── CONSTANTS ────────────────────────────────────────────────────────────────
+const ADULTS = ['Robert','Nicole','Jodie','Marcos','Kristen','Quinn','Larry'];
+const KIDS = ['Riley','Morgan'];
+const TRAVELERS = [...ADULTS, ...KIDS];
+const TRAV_COLORS = ['#6366f1','#f59e0b','#22c55e','#ec4899','#14b8a6','#f97316','#8b5cf6','#06b6d4','#ef4444'];
+const MEAL_TYPES = ['Breakfast','Lunch','Dinner','Drinks','Snack'];
+const CUISINES = ['Mexican','Seafood','Steakhouse','Italian','American','Asian','Mediterranean','International','Bar/Cantina','Other'];
+const MOODS = [{v:'amazing',l:'🤩 Amazing'},{v:'great',l:'😁 Great'},{v:'good',l:'😊 Good'},{v:'meh',l:'😐 Meh'},{v:'rough',l:'😞 Rough'}];
+const MOOD_COLORS = {amazing:'#22c55e',great:'#16a34a',good:'#0891b2',meh:'#d97706',rough:'#ef4444'};
+const SK = 'cabo2026_v1';
+
+// Build 13-day array May 18–30, 2026
+const DAYS = (() => {
+  const days = [];
+  const DNAMES = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
+  const MNAMES = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+  for (let i = 0; i < 13; i++) {
+    const d = new Date('2026-05-18');
+    d.setDate(d.getDate() + i);
+    days.push({
+      date: d.toISOString().slice(0, 10),
+      dayNum: i + 1,
+      short: `${DNAMES[d.getDay()]} May ${d.getDate()}`,
+      long: `Day ${i+1} — ${DNAMES[d.getDay()]}, May ${d.getDate()}`
+    });
+  }
+  return days;
+})();
+
+function todayStr() { return new Date().toISOString().slice(0, 10); }
+function todayDayIndex() { return DAYS.findIndex(d => d.date === todayStr()); }
+function travColor(name) { const i = TRAVELERS.indexOf(name); return i >= 0 ? TRAV_COLORS[i % TRAV_COLORS.length] : '#64748b'; }
+function travInitial(name) { return name[0].toUpperCase(); }
+function isKid(name) { return KIDS.includes(name); }
+
+// ─── STORAGE ──────────────────────────────────────────────────────────────────
+const DB = {
+  load() { try { return JSON.parse(localStorage.getItem(SK) || '{}'); } catch { return {}; } },
+  save(d) { try { localStorage.setItem(SK, JSON.stringify(d)); } catch {} }
+};
+
+function defaultDayData() {
+  const obj = {};
+  DAYS.forEach(d => { obj[d.date] = { activities: [], note: '', highlight: '', mood: '' }; });
+  return obj;
+}
+
+// ─── STATE ────────────────────────────────────────────────────────────────────
+const state = {
+  view: 'dashboard',
+  selectedDate: null,
+  selectedMealId: null,
+  mealFilter: 'All',
+  meals: [],
+  wines: [],
+  dayData: defaultDayData()
+};
+
+// Load persisted data
+(function init() {
+  const stored = DB.load();
+  if (stored.meals) state.meals = stored.meals;
+  if (stored.wines) state.wines = stored.wines;
+  if (stored.dayData) {
+    // Merge to preserve any new days
+    Object.keys(stored.dayData).forEach(date => {
+      if (state.dayData[date]) state.dayData[date] = stored.dayData[date];
+    });
+  }
+})();
+
+function persist() {
+  DB.save({ meals: state.meals, wines: state.wines, dayData: state.dayData });
+}
+
+// ─── TOAST ────────────────────────────────────────────────────────────────────
+let _toastTimer;
+function toast(msg, dur = 2200) {
+  const w = document.getElementById('toastWrap');
+  const m = document.getElementById('toastMsg');
+  m.textContent = msg;
+  w.style.display = 'flex';
+  clearTimeout(_toastTimer);
+  _toastTimer = setTimeout(() => w.style.display = 'none', dur);
+}
+
+// ─── HELPERS ──────────────────────────────────────────────────────────────────
+function mealAvgRating(meal) {
+  const ratings = TRAVELERS.map(t => (meal.orders?.[t]?.rating) || 0).filter(r => r > 0);
+  return ratings.length ? (ratings.reduce((a, b) => a + b, 0) / ratings.length) : 0;
+}
+
+function starsDisplay(rating, sm = false) {
+  const cls = sm ? 'star sm' : 'star';
+  return [1,2,3,4,5].map(n => `<span class="${cls}${n <= Math.round(rating) ? ' filled' : ''}">★</span>`).join('');
+}
+
+function starsInput(id, rating, onClickFn) {
+  return `<div class="stars-row" id="stars-${id}">${[1,2,3,4,5].map(n =>
+    `<span class="star${n <= rating ? ' filled' : ''}" onclick="${onClickFn}(${n},'${id}')" data-n="${n}">★</span>`
+  ).join('')}</div>`;
+}
+
+function formatPrice(p) {
+  const n = parseFloat(p);
+  return isNaN(n) ? '—' : '$' + n.toFixed(2).replace(/\.00$/, '');
+}
+
+function getBestRestaurants() {
+  const map = {};
+  state.meals.forEach(meal => {
+    if (!meal.restaurant) return;
+    const key = meal.restaurant.toLowerCase();
+    if (!map[key]) map[key] = { name: meal.restaurant, cuisine: meal.cuisine, ratings: [], visits: 0, mustReturn: false };
+    map[key].visits++;
+    if (meal.mustReturn) map[key].mustReturn = true;
+    TRAVELERS.forEach(t => {
+      const r = meal.orders?.[t]?.rating;
+      if (r > 0) map[key].ratings.push(r);
+    });
+  });
+  return Object.values(map)
+    .map(r => ({ ...r, avg: r.ratings.length ? r.ratings.reduce((a,b)=>a+b,0)/r.ratings.length : 0 }))
+    .filter(r => r.ratings.length > 0)
+    .sort((a, b) => b.avg - a.avg);
+}
+
+function getBestDishes() {
+  const dishes = [];
+  state.meals.forEach(meal => {
+    TRAVELERS.forEach(t => {
+      const o = meal.orders?.[t];
+      if (o?.dish && o.rating > 0) {
+        dishes.push({ dish: o.dish, person: t, restaurant: meal.restaurant, date: meal.date, rating: o.rating, mealType: meal.mealType, mealId: meal.id });
+      }
+    });
+  });
+  return dishes.sort((a, b) => b.rating - a.rating);
+}
+
+function getPersonStats() {
+  const stats = {};
+  TRAVELERS.forEach(t => {
+    const ratings = [], dishes = [];
+    state.meals.forEach(meal => {
+      const o = meal.orders?.[t];
+      if (o?.rating > 0) ratings.push(o.rating);
+      if (o?.dish) dishes.push({ dish: o.dish, rating: o.rating || 0, restaurant: meal.restaurant });
+    });
+    const topDish = [...dishes].filter(d => d.rating > 0).sort((a,b)=>b.rating-a.rating)[0];
+    stats[t] = { avgRating: ratings.length ? ratings.reduce((a,b)=>a+b,0)/ratings.length : null, count: ratings.length, topDish };
+  });
+  return stats;
+}
+
+function getWineStats() {
+  const total = state.wines.reduce((s, w) => s + (parseFloat(w.pricePerBottle) || 0), 0);
+  return { total, count: state.wines.length };
+}
+
+function mealsForDate(date) { return state.meals.filter(m => m.date === date); }
+
+function uid() { return Math.random().toString(36).slice(2) + Date.now().toString(36); }
+
+// ─── VIEWS ────────────────────────────────────────────────────────────────────
+const Views = {
+
+  dashboard() {
+    const todayIdx = todayDayIndex();
+    const today = DAYS[todayIdx];
+    const tripActive = todayIdx >= 0;
+    const tripDone = new Date(todayStr()) > new Date('2026-05-30');
+    const totalMeals = state.meals.length;
+    const totalWines = state.wines.length;
+    const wineStats = getWineStats();
+    const totalActs = DAYS.reduce((s, d) => s + (state.dayData[d.date]?.activities?.length || 0), 0);
+
+    let heroContent;
+    if (tripDone) {
+      heroContent = `<h1>Cabo 2026 🌊</h1><p>Cabo San Lucas, Mexico · May 18–30</p><div class="day-badge">✅ Trip Complete!</div>`;
+    } else if (tripActive) {
+      const daysLeft = 12 - todayIdx;
+      heroContent = `<h1>Cabo 2026 🌊</h1><p>Cabo San Lucas, Mexico · May 18–30</p><div class="day-badge">📍 ${today.long} · ${daysLeft} day${daysLeft!==1?'s':''} left</div>`;
+    } else {
+      heroContent = `<h1>Cabo 2026 🌊</h1><p>Cabo San Lucas, Mexico</p><div class="day-badge">🗓 May 18–30, 2026 · 13 Days</div>`;
+    }
+
+    const pct = tripActive ? Math.round(((todayIdx + 1) / 13) * 100) : (tripDone ? 100 : 0);
+
+    // Today's meals
+    const todayMeals = today ? mealsForDate(today.date) : [];
+    const todayActs = today ? (state.dayData[today.date]?.activities || []) : [];
+
+    let todayMealsHtml = '';
+    if (todayMeals.length) {
+      todayMealsHtml = todayMeals.map(m => {
+        const avg = mealAvgRating(m);
+        return `<div class="meal-card" style="margin-bottom:6px;padding:10px 14px" onclick="App.openMealDetail('${m.id}')">
+          <div style="display:flex;justify-content:space-between;align-items:center">
+            <div><div style="font-weight:600;font-size:14px">${m.restaurant||'Unnamed'}</div>
+            <div style="font-size:12px;color:var(--text3)">${m.mealType}${m.cuisine?' · '+m.cuisine:''}</div></div>
+            <div style="display:flex;align-items:center;gap:4px">${avg>0?starsDisplay(avg,true)+'<span style="font-size:12px;color:var(--text3);margin-left:3px">'+avg.toFixed(1)+'</span>':'<span style="font-size:12px;color:var(--text3)">No ratings</span>'}</div>
+          </div></div>`;
+      }).join('');
+    } else {
+      todayMealsHtml = `<div style="text-align:center;padding:16px 0;color:var(--text3);font-size:13px">No meals logged today</div>`;
+    }
+
+    let todayActsHtml = '';
+    if (todayActs.length) {
+      todayActsHtml = todayActs.map(a => `<div style="display:flex;align-items:center;gap:8px;padding:6px 0;border-bottom:1px solid var(--border2)">
+        <span style="font-size:18px">🎯</span>
+        <div style="flex:1"><div style="font-size:14px;font-weight:500">${a.name}</div></div>
+        ${a.rating>0?`<div style="font-size:12px">${starsDisplay(a.rating,true)}</div>`:''}
+      </div>`).join('');
+    } else {
+      todayActsHtml = `<div style="text-align:center;padding:16px 0;color:var(--text3);font-size:13px">No activities logged today</div>`;
+    }
+
+    const bestRests = getBestRestaurants();
+    const topRestHtml = bestRests.length ? `<div class="card" style="margin-bottom:10px">
+      <div class="section-label">🏆 Top Restaurant</div>
+      <div style="display:flex;align-items:center;gap:10px">
+        <div style="font-size:28px">🥇</div>
+        <div style="flex:1"><div style="font-weight:700;font-size:16px">${bestRests[0].name}</div>
+        <div style="font-size:12px;color:var(--text3)">${bestRests[0].cuisine||''} · ${bestRests[0].visits} visit${bestRests[0].visits!==1?'s':''}</div></div>
+        <div style="font-family:'Outfit',sans-serif;font-size:22px;font-weight:800;color:#f59e0b">${bestRests[0].avg.toFixed(1)}<span style="font-size:12px;color:var(--text3)">/5</span></div>
+      </div></div>` : '';
+
+    document.getElementById('mainHeader').innerHTML = `
+      <div class="header-logo"><div class="header-icon">🌊</div>
+        <div><div class="header-title">Cabo 2026</div><div class="header-sub">Command Center</div></div>
+      </div>
+      <div class="header-actions"><button class="btn btn-sm" style="background:var(--primary);color:#fff;padding:7px 12px;font-size:12px" onclick="App.showReport()">📄 Report</button></div>`;
+
+    return `<div style="padding:0 16px">
+      <div style="height:14px"></div>
+      <div class="trip-hero">${heroContent}</div>
+
+      <div style="margin-bottom:14px">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px">
+          <span style="font-size:12px;color:var(--text3)">Trip Progress</span>
+          <span style="font-size:12px;font-weight:600;color:var(--primary)">${todayIdx>=0?todayIdx+1:0} of 13 days</span>
+        </div>
+        <div class="progress-bar"><div class="progress-fill" style="width:${pct}%"></div></div>
+      </div>
+
+      <div class="stat-grid-4" style="grid-template-columns:1fr 1fr 1fr 1fr">
+        ${[['🍽','Meals',totalMeals,'meals'],['🍷','Wines',totalWines,'wines'],['🎯','Activities',totalActs,'acts'],['💰','Wine $',wineStats.total>0?'$'+Math.round(wineStats.total):'—','spend']].map(([ic,lb,val])=>`
+        <div class="stat-card" style="padding:12px 6px">
+          <div style="font-size:20px;margin-bottom:3px">${ic}</div>
+          <div class="stat-num" style="font-size:22px">${val}</div>
+          <div class="stat-label">${lb}</div>
+        </div>`).join('')}
+      </div>
+
+      ${topRestHtml}
+
+      ${today ? `
+      <div class="card" style="margin-bottom:10px">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">
+          <div><div class="section-label" style="margin-bottom:2px">Today's Meals</div>
+          <div style="font-size:12px;color:var(--text3)">${today.short}</div></div>
+          <button class="btn btn-sm btn-primary" onclick="App.openAddMeal('${today.date}')">+ Meal</button>
+        </div>
+        ${todayMealsHtml}
+      </div>
+
+      <div class="card" style="margin-bottom:10px">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">
+          <div><div class="section-label" style="margin-bottom:2px">Today's Activities</div></div>
+          <button class="btn btn-sm btn-secondary" onclick="App.openDayDetail('${today.date}')">View Day</button>
+        </div>
+        ${todayActsHtml}
+      </div>` : ''}
+
+      <div style="display:flex;gap:8px;padding-bottom:10px;flex-wrap:wrap">
+        <button class="btn btn-primary" onclick="App.openAddMeal()" style="flex:1;min-width:100px">🍽 Add Meal</button>
+        <button class="btn btn-wine" onclick="App.openAddWine()" style="flex:1;min-width:100px">🍷 Add Wine</button>
+        <button class="btn btn-orange" onclick="App.setView('rankings')" style="flex:1;min-width:100px">🏆 Best Of</button>
+      </div>
+    </div>`;
+  },
+
+  days() {
+    document.getElementById('mainHeader').innerHTML = `
+      <div class="header-logo"><div class="header-icon">🌊</div>
+        <div><div class="header-title">Cabo 2026</div><div class="header-sub">Day by Day</div></div>
+      </div><div class="header-actions"></div>`;
+
+    const todayDate = todayStr();
+    let html = `<div class="page-header"><div class="page-title">📅 Days</div><div class="page-sub">May 18–30 · 13 days</div></div><div style="padding:0 16px">`;
+
+    DAYS.forEach(day => {
+      const dd = state.dayData[day.date] || {};
+      const actCount = (dd.activities || []).length;
+      const mealCount = mealsForDate(day.date).length;
+      const isToday = day.date === todayDate;
+      const isPast = day.date < todayDate;
+      const statusClass = isToday ? 'today' : isPast ? 'past' : 'future';
+      const moodEmoji = dd.mood ? MOODS.find(m=>m.v===dd.mood)?.l.split(' ')[0] : '';
+      const highlight = dd.highlight || '';
+
+      html += `<div class="day-card ${statusClass}" onclick="App.openDayDetail('${day.date}')">
+        <div style="display:flex;align-items:center;justify-content:space-between">
+          <div style="display:flex;align-items:center;gap:10px">
+            <div style="text-align:center;min-width:36px">
+              <div style="font-family:'Outfit',sans-serif;font-size:22px;font-weight:800;color:${isToday?'var(--primary)':'var(--text2)'};line-height:1">${new Date(day.date+'T12:00:00').getDate()}</div>
+              <div style="font-size:10px;color:var(--text3);font-weight:600">${day.short.split(' ')[0].toUpperCase()}</div>
+            </div>
+            <div>
+              <div style="display:flex;align-items:center;gap:6px">
+                <span style="font-weight:600;font-size:15px">${day.long}</span>
+                ${isToday ? '<span class="today-pill">TODAY</span>' : ''}
+                ${moodEmoji ? `<span style="font-size:16px">${moodEmoji}</span>` : ''}
+              </div>
+              ${highlight ? `<div style="font-size:12px;color:var(--text3);font-style:italic;margin-top:1px">✨ ${highlight}</div>` : ''}
+              <div style="font-size:12px;color:var(--text3);margin-top:2px">${mealCount} meal${mealCount!==1?'s':''} · ${actCount} activit${actCount!==1?'ies':'y'}</div>
+            </div>
+          </div>
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--text3)" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg>
+        </div>
+      </div>`;
+    });
+
+    html += '</div>';
+    return html;
+  },
+
+  'day-detail'() {
+    const day = DAYS.find(d => d.date === state.selectedDate);
+    if (!day) return Views.days();
+    const dd = state.dayData[day.date];
+    const dayMeals = mealsForDate(day.date);
+    const isToday = day.date === todayStr();
+
+    document.getElementById('mainHeader').innerHTML = `
+      <div style="display:flex;align-items:center;gap:10px">
+        <button class="btn btn-secondary btn-sm" onclick="App.setView('days')" style="padding:7px 12px">← Days</button>
+        <div><div style="font-family:'Outfit',sans-serif;font-weight:700;font-size:15px">${day.long}</div>
+        ${isToday?'<div class="today-pill" style="font-size:10px">TODAY</div>':''}</div>
+      </div>
+      <div class="header-actions"><button class="btn btn-sm btn-primary" onclick="App.openAddActivity('${day.date}')">+ Activity</button></div>`;
+
+    const moodBtns = MOODS.map(m => `<button class="mood-btn${dd.mood===m.v?' selected':''}" onclick="App.setMood('${day.date}','${m.v}')">${m.l}</button>`).join('');
+
+    const activitiesHtml = dd.activities.length ? dd.activities.map((a, i) => `
+      <div class="activity-row">
+        <div style="font-size:22px">🎯</div>
+        <div style="flex:1">
+          <div style="font-weight:600;font-size:14px">${a.name}</div>
+          ${a.description ? `<div style="font-size:12px;color:var(--text2);margin-top:2px">${a.description}</div>` : ''}
+          ${a.rating > 0 ? `<div style="margin-top:4px">${starsDisplay(a.rating, true)}</div>` : ''}
+          ${a.notes ? `<div style="font-size:12px;color:var(--text3);font-style:italic;margin-top:3px">${a.notes}</div>` : ''}
+        </div>
+        <button onclick="App.removeActivity('${day.date}',${i})" style="background:transparent;border:none;color:var(--red);font-size:16px;cursor:pointer;padding:4px;flex-shrink:0">✕</button>
+      </div>`).join('') :
+      `<div style="text-align:center;padding:20px;color:var(--text3);font-size:13px">No activities yet — tap + Activity to add one</div>`;
+
+    const mealsHtml = dayMeals.length ? dayMeals.map(m => {
+      const avg = mealAvgRating(m);
+      return `<div class="meal-card" onclick="App.openMealDetail('${m.id}')" style="margin-bottom:6px;padding:10px 14px">
+        <div style="display:flex;justify-content:space-between;align-items:center">
+          <div>
+            <div style="font-weight:600;font-size:14px">${m.restaurant||'Unnamed'}</div>
+            <div style="font-size:12px;color:var(--text3)">${m.mealType}${m.cuisine?' · '+m.cuisine:''}</div>
+          </div>
+          <div style="display:flex;align-items:center;gap:4px">${avg>0?starsDisplay(avg,true)+`<span style="font-size:12px;color:var(--text3);margin-left:3px">${avg.toFixed(1)}</span>`:'<span style="font-size:12px;color:var(--text3)">—</span>'}</div>
+        </div>
+        ${m.mustReturn?'<div style="margin-top:6px"><span class="must-return-badge">⭐ Must Return!</span></div>':''}
+      </div>`;
+    }).join('') : `<div style="text-align:center;padding:16px;color:var(--text3);font-size:13px">No meals for this day — <span style="color:var(--primary);cursor:pointer" onclick="App.openAddMeal('${day.date}')">add one</span></div>`;
+
+    return `<div style="padding:0 16px;margin-top:14px">
+      <div class="card" style="margin-bottom:10px">
+        <div class="section-label">Day Mood</div>
+        <div class="mood-btns">${moodBtns}</div>
+      </div>
+
+      <div class="card" style="margin-bottom:10px">
+        <div class="section-label">Day Highlight</div>
+        <input class="input" id="highlight-inp" value="${dd.highlight||''}" placeholder="Best moment of the day..." oninput="App.setHighlight('${day.date}',this.value)">
+      </div>
+
+      <div class="card" style="margin-bottom:10px">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">
+          <div class="section-label" style="margin-bottom:0">Activities</div>
+          <button class="btn btn-sm btn-secondary" onclick="App.openAddActivity('${day.date}')">+ Add</button>
+        </div>
+        ${activitiesHtml}
+      </div>
+
+      <div class="card" style="margin-bottom:10px">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">
+          <div class="section-label" style="margin-bottom:0">Meals</div>
+          <button class="btn btn-sm btn-primary" onclick="App.openAddMeal('${day.date}')">+ Meal</button>
+        </div>
+        ${mealsHtml}
+      </div>
+
+      <div class="card" style="margin-bottom:10px">
+        <div class="section-label">Day Notes</div>
+        <textarea class="input" rows="3" placeholder="Anything worth remembering..." oninput="App.setDayNote('${day.date}',this.value)">${dd.note||''}</textarea>
+      </div>
+    </div>`;
+  },
+
+  meals() {
+    document.getElementById('mainHeader').innerHTML = `
+      <div class="header-logo"><div class="header-icon">🌊</div>
+        <div><div class="header-title">Meals</div><div class="header-sub">${state.meals.length} logged</div></div>
+      </div>
+      <div class="header-actions"><button class="btn btn-sm btn-primary" onclick="App.openAddMeal()">+ Meal</button></div>`;
+
+    const filters = ['All', ...MEAL_TYPES];
+    const filterTabs = `<div class="filter-tabs">${filters.map(f =>
+      `<button class="filter-tab${state.mealFilter===f?' active':''}" onclick="App.setMealFilter('${f}')">${f}</button>`
+    ).join('')}</div>`;
+
+    let filtered = state.mealFilter === 'All' ? state.meals : state.meals.filter(m => m.mealType === state.mealFilter);
+    filtered = [...filtered].sort((a, b) => a.date < b.date ? 1 : -1);
+
+    if (!state.meals.length) {
+      return `<div class="page-header"><div class="page-title">🍽 Meals</div></div>
+        <div class="empty"><div class="empty-icon">🍽</div><h3>No meals yet</h3><p>Tap + Meal to log your first Cabo meal</p></div>`;
+    }
+
+    let html = `<div class="page-header"><div class="page-title">🍽 Meals</div></div>${filterTabs}<div style="padding:0 16px">`;
+
+    filtered.forEach(m => {
+      const avg = mealAvgRating(m);
+      const dayInfo = DAYS.find(d => d.date === m.date);
+      const orderedCount = TRAVELERS.filter(t => m.orders?.[t]?.dish).length;
+
+      html += `<div class="meal-card" onclick="App.openMealDetail('${m.id}')">
+        <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:10px">
+          <div style="flex:1">
+            <div style="font-family:'Outfit',sans-serif;font-size:17px;font-weight:700;margin-bottom:3px">${m.restaurant||'Unnamed Meal'}</div>
+            <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:6px">
+              <span class="badge badge-blue">${m.mealType}</span>
+              ${m.cuisine?`<span class="badge badge-amber">${m.cuisine}</span>`:''}
+              ${dayInfo?`<span class="badge" style="background:rgba(8,145,178,.08);color:var(--text3)">${dayInfo.short}</span>`:''}
+              ${m.mustReturn?'<span class="must-return-badge">⭐ Must Return</span>':''}
+            </div>
+            <div style="font-size:12px;color:var(--text3)">${orderedCount}/${TRAVELERS.length} orders logged</div>
+          </div>
+          <div style="text-align:right;flex-shrink:0">
+            ${avg > 0 ? `<div style="font-family:'Outfit',sans-serif;font-size:24px;font-weight:800;color:#f59e0b;line-height:1">${avg.toFixed(1)}</div>
+            <div style="font-size:11px;color:var(--text3)">/ 5 avg</div>` :
+            `<div style="font-size:12px;color:var(--text3)">No ratings</div>`}
+          </div>
+        </div>
+      </div>`;
+    });
+
+    html += '</div>';
+    return html;
+  },
+
+  'meal-detail'() {
+    const meal = state.meals.find(m => m.id === state.selectedMealId);
+    if (!meal) return Views.meals();
+    const dayInfo = DAYS.find(d => d.date === meal.date);
+    const avg = mealAvgRating(meal);
+
+    document.getElementById('mainHeader').innerHTML = `
+      <div style="display:flex;align-items:center;gap:10px;flex:1;min-width:0">
+        <button class="btn btn-secondary btn-sm" onclick="App.setView('meals')" style="padding:7px 12px;flex-shrink:0">← Meals</button>
+        <div style="min-width:0"><div style="font-family:'Outfit',sans-serif;font-weight:700;font-size:15px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${meal.restaurant||'Meal'}</div>
+        <div style="font-size:11px;color:var(--text3)">${meal.mealType}${dayInfo?' · '+dayInfo.short:''}</div></div>
+      </div>
+      <div class="header-actions" style="flex-shrink:0">
+        <button class="btn btn-sm btn-secondary" onclick="App.editMeal('${meal.id}')">Edit</button>
+        <button class="btn btn-sm btn-danger" onclick="App.deleteMeal('${meal.id}')">Delete</button>
+      </div>`;
+
+    // Per-person orders
+    const adultRows = ADULTS.map(t => {
+      const o = meal.orders?.[t] || {};
+      const c = travColor(t);
+      return `<div class="activity-row" style="gap:10px;align-items:flex-start">
+        <div class="trav-avatar" style="background:${c}22;border:2px solid ${c};color:${c};font-size:12px;width:32px;height:32px;margin-top:2px">${travInitial(t)}</div>
+        <div style="flex:1">
+          <div style="font-weight:600;font-size:13px;color:${c}">${t}</div>
+          ${o.dish ? `<div style="font-size:14px;margin-top:2px">${o.dish}</div>` : `<div style="font-size:13px;color:var(--text3);font-style:italic">Not logged</div>`}
+          ${o.rating > 0 ? `<div style="margin-top:3px">${starsDisplay(o.rating, true)}</div>` : ''}
+          ${o.notes ? `<div style="font-size:12px;color:var(--text3);font-style:italic;margin-top:2px">${o.notes}</div>` : ''}
+        </div>
+      </div>`;
+    }).join('');
+
+    const kidRows = KIDS.map(t => {
+      const o = meal.orders?.[t] || {};
+      const c = travColor(t);
+      return `<div class="activity-row" style="gap:10px;align-items:flex-start">
+        <div class="trav-avatar" style="background:${c}22;border:2px solid ${c};color:${c};font-size:12px;width:32px;height:32px;margin-top:2px">${travInitial(t)} 🧒</div>
+        <div style="flex:1">
+          <div style="font-weight:600;font-size:13px;color:${c}">${t}</div>
+          ${o.dish ? `<div style="font-size:14px;margin-top:2px">${o.dish}</div>` : `<div style="font-size:13px;color:var(--text3);font-style:italic">Not logged</div>`}
+          ${o.rating > 0 ? `<div style="margin-top:3px">${starsDisplay(o.rating, true)}</div>` : ''}
+        </div>
+      </div>`;
+    }).join('');
+
+    return `<div style="padding:0 16px;margin-top:14px">
+      ${meal.mustReturn ? `<div style="background:linear-gradient(135deg,rgba(249,115,22,.1),rgba(234,88,12,.05));border:1.5px solid rgba(249,115,22,.4);border-radius:14px;padding:12px 16px;margin-bottom:10px;text-align:center">
+        <span style="font-size:22px">⭐</span> <span style="font-weight:700;color:var(--orange);font-size:15px">Must Return!</span>
+      </div>` : ''}
+
+      <div class="card" style="margin-bottom:10px">
+        <div style="display:flex;justify-content:space-between;align-items:flex-start">
+          <div>
+            <div style="font-family:'Outfit',sans-serif;font-size:22px;font-weight:800;margin-bottom:6px">${meal.restaurant||'Unnamed'}</div>
+            <div style="display:flex;gap:6px;flex-wrap:wrap">
+              <span class="badge badge-blue">${meal.mealType}</span>
+              ${meal.cuisine?`<span class="badge badge-amber">${meal.cuisine}</span>`:''}
+              ${dayInfo?`<span class="badge" style="background:rgba(8,145,178,.08);color:var(--text2)">${dayInfo.long}</span>`:''}
+            </div>
+            ${meal.totalBill?`<div style="font-size:13px;color:var(--text3);margin-top:6px">💰 Total bill: <strong style="color:var(--text)">$${meal.totalBill}</strong></div>`:''}
+          </div>
+          ${avg>0?`<div style="text-align:center;flex-shrink:0">
+            <div style="font-family:'Outfit',sans-serif;font-size:36px;font-weight:800;color:#f59e0b;line-height:1">${avg.toFixed(1)}</div>
+            <div style="font-size:11px;color:var(--text3)">group avg / 5</div>
+          </div>`:''}
+        </div>
+      </div>
+
+      ${meal.menuPhoto?`<div class="card" style="margin-bottom:10px;padding:10px">
+        <div class="section-label">Menu Photo</div>
+        <img src="${meal.menuPhoto}" class="photo-preview" onclick="App.viewPhoto('${meal.id}')" style="cursor:pointer">
+        <div style="font-size:11px;color:var(--text3);margin-top:5px;text-align:center">Tap to enlarge</div>
+      </div>`:''}
+
+      <div class="card" style="margin-bottom:10px">
+        <div class="section-label">Orders — Adults</div>
+        ${adultRows}
+      </div>
+
+      <div class="card" style="margin-bottom:10px">
+        <div class="section-label">Orders — Kids</div>
+        ${kidRows}
+      </div>
+
+      ${meal.overallNotes?`<div class="card" style="margin-bottom:10px;background:rgba(8,145,178,.04);border-color:var(--border2)">
+        <div class="section-label">Notes</div>
+        <div style="font-size:14px;color:var(--text2);line-height:1.7">${meal.overallNotes}</div>
+      </div>`:''}
+    </div>`;
+  },
+
+  wine() {
+    const stats = getWineStats();
+    document.getElementById('mainHeader').innerHTML = `
+      <div class="header-logo"><div class="header-icon">🌊</div>
+        <div><div class="header-title">Wine Log</div><div class="header-sub">${stats.count} bottle${stats.count!==1?'s':''}</div></div>
+      </div>
+      <div class="header-actions"><button class="btn btn-sm btn-wine" onclick="App.openAddWine()">+ Wine</button></div>`;
+
+    if (!state.wines.length) {
+      return `<div class="empty" style="margin-top:40px"><div class="empty-icon">🍷</div><h3>No wines yet</h3><p>Log your first Cabo wine</p></div>`;
+    }
+
+    const sorted = [...state.wines].sort((a,b) => a.date < b.date ? 1 : -1);
+
+    let html = `
+      <div style="background:linear-gradient(135deg,var(--wine),var(--wine2));border-radius:16px;padding:18px;margin:16px 16px 10px;color:#fff">
+        <div style="font-size:13px;opacity:.8;margin-bottom:4px">Total Wine Spend</div>
+        <div style="font-family:'Outfit',sans-serif;font-size:36px;font-weight:800;line-height:1">${formatPrice(stats.total)}</div>
+        <div style="font-size:12px;opacity:.75;margin-top:4px">${stats.count} bottle${stats.count!==1?'s':''} · avg ${stats.count>0?formatPrice(stats.total/stats.count):'—'} each</div>
+      </div>
+      <div style="padding:0 16px">`;
+
+    sorted.forEach(w => {
+      const dayInfo = DAYS.find(d => d.date === w.date);
+      html += `<div class="wine-card" onclick="App.editWine('${w.id}')">
+        <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:10px">
+          <div style="flex:1">
+            <div style="font-family:'Outfit',sans-serif;font-size:17px;font-weight:700;color:var(--wine);margin-bottom:3px">🍷 ${w.name||'Unnamed Wine'}</div>
+            <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:4px">
+              ${w.varietal?`<span class="badge badge-wine">${w.varietal}</span>`:''}
+              ${w.vintage?`<span class="badge" style="background:rgba(124,58,237,.08);color:var(--wine2)">${w.vintage}</span>`:''}
+              ${dayInfo?`<span class="badge" style="background:rgba(8,145,178,.08);color:var(--text3)">${dayInfo.short}</span>`:''}
+            </div>
+            ${w.restaurant?`<div style="font-size:12px;color:var(--text3)">📍 ${w.restaurant}</div>`:''}
+            ${w.notes?`<div style="font-size:12px;color:var(--text3);font-style:italic;margin-top:3px">${w.notes}</div>`:''}
+          </div>
+          <div style="text-align:right;flex-shrink:0">
+            <div style="font-family:'Outfit',sans-serif;font-size:22px;font-weight:800;color:var(--wine)">${formatPrice(w.pricePerBottle)}</div>
+            <div style="font-size:11px;color:var(--text3)">/bottle</div>
+          </div>
+        </div>
+      </div>`;
+    });
+
+    html += '</div>';
+    return html;
+  },
+
+  rankings() {
+    document.getElementById('mainHeader').innerHTML = `
+      <div class="header-logo"><div class="header-icon">🌊</div>
+        <div><div class="header-title">Best Of Cabo</div><div class="header-sub">Command Center</div></div>
+      </div>
+      <div class="header-actions"><button class="btn btn-sm" style="background:var(--primary);color:#fff;padding:7px 12px;font-size:12px" onclick="App.showReport()">📄 Report</button></div>`;
+
+    const bestRests = getBestRestaurants();
+    const bestDishes = getBestDishes().slice(0, 10);
+    const personStats = getPersonStats();
+    const wineStats = getWineStats();
+    const sortedWines = [...state.wines].sort((a,b)=>(parseFloat(b.pricePerBottle)||0)-(parseFloat(a.pricePerBottle)||0));
+
+    const medals = ['🥇','🥈','🥉'];
+
+    // Best restaurants
+    let restsHtml = '';
+    if (bestRests.length) {
+      restsHtml = bestRests.slice(0, 8).map((r, i) => `
+        <div class="rank-item">
+          <div class="rank-medal">${i < 3 ? medals[i] : ''}</div>
+          ${i >= 3 ? `<div class="rank-num">${i+1}</div>` : ''}
+          <div style="flex:1">
+            <div style="font-weight:700;font-size:15px">${r.name}</div>
+            <div style="font-size:12px;color:var(--text3)">${r.cuisine||''}${r.cuisine&&r.visits?' · ':''}${r.visits} visit${r.visits!==1?'s':''} ${r.mustReturn?'· <span class="must-return-badge">⭐ Must Return</span>':''}</div>
+          </div>
+          <div style="text-align:right">
+            <div style="font-family:'Outfit',sans-serif;font-size:20px;font-weight:800;color:#f59e0b">${r.avg.toFixed(1)}</div>
+            <div style="font-size:10px;color:var(--text3)">/ 5</div>
+          </div>
+        </div>`).join('');
+    } else {
+      restsHtml = `<div style="text-align:center;padding:20px;color:var(--text3);font-size:13px">Log meals with ratings to see rankings</div>`;
+    }
+
+    // Best dishes
+    let dishesHtml = '';
+    if (bestDishes.length) {
+      dishesHtml = bestDishes.map((d, i) => {
+        const c = travColor(d.person);
+        return `<div class="rank-item">
+          <div class="rank-medal">${i<3?medals[i]:''}</div>
+          ${i>=3?`<div class="rank-num">${i+1}</div>`:''}
+          <div style="flex:1">
+            <div style="font-weight:600;font-size:14px">${d.dish}</div>
+            <div style="font-size:12px;color:var(--text3)"><span style="color:${c};font-weight:600">${d.person}</span> · ${d.restaurant||'Unknown'}${d.mealType?' · '+d.mealType:''}</div>
+          </div>
+          <div style="font-size:14px">${starsDisplay(d.rating,true)}</div>
+        </div>`;
+      }).join('');
+    } else {
+      dishesHtml = `<div style="text-align:center;padding:20px;color:var(--text3);font-size:13px">No dishes rated yet</div>`;
+    }
+
+    // Traveler board
+    const sortedTravs = TRAVELERS
+      .map(t => ({ name: t, ...personStats[t] }))
+      .filter(t => t.avgRating !== null)
+      .sort((a, b) => b.avgRating - a.avgRating);
+
+    let travHtml = '';
+    if (sortedTravs.length) {
+      travHtml = sortedTravs.map((t, i) => {
+        const c = travColor(t.name);
+        return `<div class="rank-item">
+          ${i<3?`<div class="rank-medal">${medals[i]}</div>`:`<div class="rank-num">${i+1}</div>`}
+          <div class="trav-avatar" style="background:${c}22;border:2px solid ${c};color:${c};font-size:12px;width:30px;height:30px">${travInitial(t.name)}</div>
+          <div style="flex:1">
+            <div style="font-weight:600;font-size:14px">${t.name}${isKid(t.name)?' 🧒':''}</div>
+            ${t.topDish?`<div style="font-size:12px;color:var(--text3)">Fave: ${t.topDish.dish} @ ${t.topDish.restaurant||'?'}</div>`:''}
+          </div>
+          <div style="text-align:right">
+            <div style="font-family:'Outfit',sans-serif;font-size:18px;font-weight:800;color:#f59e0b">${t.avgRating.toFixed(1)}</div>
+            <div style="font-size:10px;color:var(--text3)">${t.count} rated</div>
+          </div>
+        </div>`;
+      }).join('');
+    } else {
+      travHtml = `<div style="text-align:center;padding:20px;color:var(--text3);font-size:13px">Rate meals to build the leaderboard</div>`;
+    }
+
+    // Wines
+    let wineHtml = '';
+    if (sortedWines.length) {
+      wineHtml = sortedWines.slice(0, 5).map((w, i) => `
+        <div class="rank-item">
+          ${i<3?`<div class="rank-medal">${medals[i]}</div>`:`<div class="rank-num">${i+1}</div>`}
+          <div style="flex:1">
+            <div style="font-weight:600;font-size:14px">${w.name||'Unnamed'}${w.vintage?' ('+w.vintage+')':''}</div>
+            <div style="font-size:12px;color:var(--text3)">${w.varietal||''}${w.varietal&&w.restaurant?' · ':''}${w.restaurant||''}</div>
+          </div>
+          <div style="font-family:'Outfit',sans-serif;font-size:18px;font-weight:800;color:var(--wine)">${formatPrice(w.pricePerBottle)}</div>
+        </div>`).join('');
+    } else {
+      wineHtml = `<div style="text-align:center;padding:20px;color:var(--text3);font-size:13px">No wines logged yet</div>`;
+    }
+
+    return `<div class="page-header"><div class="page-title">🏆 Best Of Cabo</div><div class="page-sub">${state.meals.length} meals · ${state.wines.length} wines</div></div>
+    <div style="padding:0 16px">
+
+      <div class="card" style="margin-bottom:10px">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
+          <div class="section-label" style="margin-bottom:0">🍽 Best Restaurants</div>
+          <span style="font-size:12px;color:var(--text3)">${bestRests.length} ranked</span>
+        </div>
+        ${restsHtml}
+      </div>
+
+      <div class="card" style="margin-bottom:10px">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
+          <div class="section-label" style="margin-bottom:0">⭐ Best Dishes</div>
+          <span style="font-size:12px;color:var(--text3)">Top ${Math.min(bestDishes.length,10)}</span>
+        </div>
+        ${dishesHtml}
+      </div>
+
+      <div class="card" style="margin-bottom:10px">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
+          <div class="section-label" style="margin-bottom:0">😋 Traveler Ratings Board</div>
+        </div>
+        ${travHtml}
+      </div>
+
+      <div class="card" style="margin-bottom:10px">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
+          <div class="section-label" style="margin-bottom:0">🍷 Top Wines</div>
+          ${wineStats.count>0?`<span style="font-size:13px;font-weight:700;color:var(--wine)">${formatPrice(wineStats.total)} total</span>`:''}
+        </div>
+        ${wineHtml}
+      </div>
+
+      <button class="btn btn-primary btn-full" onclick="App.showReport()" style="margin-bottom:16px;padding:14px">📄 Export Full Trip Report</button>
+    </div>`;
+  }
+};
+
+// ─── SHEETS ───────────────────────────────────────────────────────────────────
+let _sheet = null;
+
+function openSheet(title, content, onClose) {
+  let overlay = document.getElementById('sheetOverlay');
+  if (!overlay) { overlay = document.createElement('div'); overlay.id = 'sheetOverlay'; document.body.appendChild(overlay); }
+  overlay.className = 'sheet-bg';
+  overlay.innerHTML = `<div class="sheet" id="sheetInner"><div class="sheet-handle"></div>
+    <div class="sheet-header"><div class="sheet-title">${title}</div><button class="close-btn" onclick="closeSheet()">✕</button></div>
+    <div class="sheet-body" id="sheetBody">${content}</div></div>`;
+  overlay.style.display = 'flex';
+  overlay.onclick = e => { if (e.target === overlay) closeSheet(); };
+  window._sheetOnClose = onClose;
+}
+
+function closeSheet() {
+  const o = document.getElementById('sheetOverlay');
+  if (o) o.style.display = 'none';
+  if (window._sheetOnClose) { window._sheetOnClose(); window._sheetOnClose = null; }
+}
+
+// ─── MEAL SHEET ───────────────────────────────────────────────────────────────
+window._mealForm = {};
+
+function buildMealSheet(prefill = {}) {
+  const dateVal = prefill.date || state._addMealDate || DAYS[todayDayIndex() >= 0 ? todayDayIndex() : 0]?.date || DAYS[0].date;
+  window._mealForm = {
+    id: prefill.id || null,
+    date: dateVal,
+    restaurant: prefill.restaurant || '',
+    cuisine: prefill.cuisine || '',
+    mealType: prefill.mealType || 'Dinner',
+    overallNotes: prefill.overallNotes || '',
+    totalBill: prefill.totalBill || '',
+    mustReturn: prefill.mustReturn || false,
+    menuPhoto: prefill.menuPhoto || null,
+    orders: prefill.orders ? JSON.parse(JSON.stringify(prefill.orders)) : {}
+  };
+  TRAVELERS.forEach(t => {
+    if (!window._mealForm.orders[t]) window._mealForm.orders[t] = { dish: '', rating: 0, notes: '' };
+  });
+  return renderMealSheetHTML();
+}
+
+function renderMealSheetHTML() {
+  const f = window._mealForm;
+  const dayOpts = DAYS.map(d => `<option value="${d.date}"${f.date===d.date?' selected':''}>${d.long}</option>`).join('');
+  const cuisineOpts = CUISINES.map(c => `<option${f.cuisine===c?' selected':''}>${c}</option>`).join('');
+  const mealTypeOpts = MEAL_TYPES.map(t => `<option${f.mealType===t?' selected':''}>${t}</option>`).join('');
+
+  const photoSection = f.menuPhoto ?
+    `<img src="${f.menuPhoto}" class="photo-preview" id="menuPhotoPreview"><br>
+     <button class="btn btn-sm btn-danger" onclick="window._mealForm.menuPhoto=null;document.getElementById('menuPhotoPreview').remove(this.previousSibling);this.remove()" style="margin-top:6px">Remove Photo</button>` :
+    `<div class="photo-placeholder" onclick="document.getElementById('menuPhotoInput').click()">
+       <span>📷</span><p>Tap to attach menu photo</p>
+     </div>
+     <input type="file" id="menuPhotoInput" accept="image/*" style="display:none" onchange="App.handleMenuPhoto(this)">`;
+
+  const personRows = TRAVELERS.map(t => {
+    const o = f.orders[t] || { dish: '', rating: 0, notes: '' };
+    const c = travColor(t);
+    return `<div class="person-order-row">
+      <div class="person-row-header">
+        <div class="trav-avatar" style="background:${c}22;border:2px solid ${c};color:${c};font-size:11px;width:28px;height:28px;font-weight:700">${travInitial(t)}</div>
+        <span style="font-weight:600;font-size:14px;color:${c}">${t}${isKid(t)?' 🧒':''}</span>
+      </div>
+      <div class="person-row-inputs">
+        <input class="person-dish-input" id="dish-${t}" value="${o.dish||''}" placeholder="What did they order?" oninput="window._mealForm.orders['${t}'].dish=this.value">
+        <div class="stars-row" id="pstars-${t}">${[1,2,3,4,5].map(n=>`<span class="star${n<=(o.rating||0)?' filled':''}" onclick="App.setPersonRating(${n},'${t}')" style="font-size:18px">★</span>`).join('')}</div>
+      </div>
+    </div>`;
+  }).join('');
+
+  return `
+    <div class="field"><label>Day</label><select class="input" onchange="window._mealForm.date=this.value">${dayOpts}</select></div>
+    <div class="field"><label>Restaurant / Venue</label><input class="input" id="ms-restaurant" value="${f.restaurant}" placeholder="e.g. Don Emiliano" oninput="window._mealForm.restaurant=this.value"></div>
+    <div class="input-row">
+      <div class="field"><label>Meal Type</label><select class="input" onchange="window._mealForm.mealType=this.value">${mealTypeOpts}</select></div>
+      <div class="field"><label>Cuisine</label><select class="input" onchange="window._mealForm.cuisine=this.value"><option value="">—</option>${cuisineOpts}</select></div>
+    </div>
+    <div class="input-row">
+      <div class="field"><label>Total Bill ($)</label><input class="input" type="number" id="ms-bill" value="${f.totalBill}" placeholder="0.00" oninput="window._mealForm.totalBill=this.value"></div>
+      <div class="field" style="display:flex;align-items:flex-end;padding-bottom:14px">
+        <div class="toggle-wrap">
+          <button class="toggle${f.mustReturn?' on':''}" id="mustReturnToggle" onclick="App.toggleMustReturn()"><div class="toggle-knob"></div></button>
+          <span style="font-size:13px;font-weight:600;color:var(--orange)">⭐ Must Return</span>
+        </div>
+      </div>
+    </div>
+    <div class="field"><label>Menu Photo (Reference)</label>${photoSection}</div>
+    <div class="field" style="margin-bottom:6px"><label>Orders & Ratings — tap stars to rate</label></div>
+    <div style="background:var(--bg);border-radius:12px;padding:0 12px;margin-bottom:14px">${personRows}</div>
+    <div class="field"><label>Notes</label><textarea class="input" id="ms-notes" rows="2" placeholder="Anything memorable about this meal..." oninput="window._mealForm.overallNotes=this.value">${f.overallNotes}</textarea></div>
+    <div style="display:flex;gap:10px;margin-top:6px;padding-bottom:6px">
+      <button class="btn btn-secondary" onclick="closeSheet()" style="flex:1">Cancel</button>
+      <button class="btn btn-primary" onclick="App.saveMeal()" style="flex:2">💾 Save Meal</button>
+    </div>`;
+}
+
+// ─── WINE SHEET ───────────────────────────────────────────────────────────────
+window._wineForm = {};
+
+function buildWineSheet(prefill = {}) {
+  const dateVal = prefill.date || DAYS[todayDayIndex() >= 0 ? todayDayIndex() : 0]?.date || DAYS[0].date;
+  window._wineForm = {
+    id: prefill.id || null,
+    date: prefill.date || dateVal,
+    name: prefill.name || '',
+    varietal: prefill.varietal || '',
+    vintage: prefill.vintage || '',
+    restaurant: prefill.restaurant || '',
+    pricePerBottle: prefill.pricePerBottle || '',
+    notes: prefill.notes || ''
+  };
+
+  const dayOpts = DAYS.map(d => `<option value="${d.date}"${window._wineForm.date===d.date?' selected':''}>${d.long}</option>`).join('');
+
+  return `
+    <div class="field"><label>Day</label><select class="input" onchange="window._wineForm.date=this.value">${dayOpts}</select></div>
+    <div class="field"><label>Wine Name *</label><input class="input" id="wf-name" value="${window._wineForm.name}" placeholder="e.g. Chateau Margaux" oninput="window._wineForm.name=this.value"></div>
+    <div class="input-row">
+      <div class="field"><label>Varietal</label><input class="input" id="wf-varietal" value="${window._wineForm.varietal}" placeholder="e.g. Cabernet Sauvignon" oninput="window._wineForm.varietal=this.value"></div>
+      <div class="field"><label>Vintage</label><input class="input" id="wf-vintage" type="number" value="${window._wineForm.vintage}" placeholder="e.g. 2020" min="1900" max="2030" oninput="window._wineForm.vintage=this.value"></div>
+    </div>
+    <div class="input-row">
+      <div class="field"><label>Price / Bottle ($)</label><input class="input" id="wf-price" type="number" value="${window._wineForm.pricePerBottle}" placeholder="0.00" min="0" oninput="window._wineForm.pricePerBottle=this.value"></div>
+      <div class="field"><label>Restaurant / Venue</label><input class="input" id="wf-rest" value="${window._wineForm.restaurant}" placeholder="Where ordered" oninput="window._wineForm.restaurant=this.value"></div>
+    </div>
+    <div class="field"><label>Notes</label><textarea class="input" id="wf-notes" rows="2" placeholder="Tasting notes, pairing, etc." oninput="window._wineForm.notes=this.value">${window._wineForm.notes}</textarea></div>
+    <div style="display:flex;gap:10px;margin-top:6px;padding-bottom:6px">
+      <button class="btn btn-secondary" onclick="closeSheet()" style="flex:1">Cancel</button>
+      <button class="btn btn-wine" onclick="App.saveWine()" style="flex:2">🍷 Save Wine</button>
+    </div>`;
+}
+
+// ─── ACTIVITY SHEET ───────────────────────────────────────────────────────────
+window._actForm = {};
+
+function buildActivitySheet(date, prefill = {}) {
+  window._actForm = { date, id: prefill.id || null, name: prefill.name || '', description: prefill.description || '', rating: prefill.rating || 0, notes: prefill.notes || '' };
+  return `
+    <div class="field"><label>Activity Name *</label><input class="input" id="af-name" value="${window._actForm.name}" placeholder="e.g. Snorkeling, Sunset Cruise" oninput="window._actForm.name=this.value"></div>
+    <div class="field"><label>Description</label><input class="input" id="af-desc" value="${window._actForm.description}" placeholder="Brief description..." oninput="window._actForm.description=this.value"></div>
+    <div class="field"><label>Rating</label>
+      <div class="stars-row" id="act-stars">${[1,2,3,4,5].map(n=>`<span class="star${n<=window._actForm.rating?' filled':''}" onclick="App.setActRating(${n})" style="font-size:24px">★</span>`).join('')}</div>
+    </div>
+    <div class="field"><label>Notes</label><textarea class="input" id="af-notes" rows="2" placeholder="Anything memorable..." oninput="window._actForm.notes=this.value">${window._actForm.notes}</textarea></div>
+    <div style="display:flex;gap:10px;margin-top:6px;padding-bottom:6px">
+      <button class="btn btn-secondary" onclick="closeSheet()" style="flex:1">Cancel</button>
+      <button class="btn btn-orange" onclick="App.saveActivity()" style="flex:2">🎯 Save Activity</button>
+    </div>`;
+}
+
+// ─── REPORT BUILDER ───────────────────────────────────────────────────────────
+function buildReport() {
+  const meals = state.meals;
+  const wines = state.wines;
+  const wStats = getWineStats();
+  const bestRests = getBestRestaurants();
+  const bestDishes = getBestDishes().slice(0, 10);
+  const pStats = getPersonStats();
+  const totalActs = DAYS.reduce((s,d)=>s+(state.dayData[d.date]?.activities?.length||0),0);
+  const medals = ['🥇','🥈','🥉'];
+
+  function sbar(v, max=5, color='#f59e0b') {
+    const pct = max > 0 ? (v/max)*100 : 0;
+    return `<div style="height:6px;background:#f1f5f9;border-radius:3px;margin-top:4px"><div style="height:6px;border-radius:3px;background:${color};width:${pct}%"></div></div>`;
+  }
+  function stars5(r) { return [1,2,3,4,5].map(n=>`<span style="color:${n<=Math.round(r)?'#f59e0b':'#cbd5e1'};font-size:14px">★</span>`).join(''); }
+
+  const restRows = bestRests.map((r,i) => `
+    <div style="padding:10px 0;border-bottom:1px solid #f1f5f9">
+      <div style="display:flex;align-items:center;justify-content:space-between">
+        <div style="display:flex;align-items:center;gap:10px">
+          <span style="font-size:20px">${i<3?medals[i]:(i+1)+'.'}</span>
+          <div><div style="font-weight:700;font-size:15px">${r.name}</div>
+          <div style="font-size:12px;color:#64748b">${r.cuisine||''}${r.cuisine&&r.visits?' · ':''}${r.visits} visit${r.visits!==1?'s':''}${r.mustReturn?' · ⭐ Must Return':''}</div></div>
+        </div>
+        <div style="font-family:'Outfit',sans-serif;font-size:22px;font-weight:800;color:#f59e0b">${r.avg.toFixed(1)}<span style="font-size:12px;color:#94a3b8">/5</span></div>
+      </div>
+      ${sbar(r.avg)}
+    </div>`).join('');
+
+  const dishRows = bestDishes.map((d, i) => {
+    const c = travColor(d.person);
+    return `<div style="padding:8px 0;border-bottom:1px solid #f1f5f9">
+      <div style="display:flex;align-items:center;gap:10px">
+        <span style="font-size:18px">${i<3?medals[i]:(i+1)+'.'}</span>
+        <div style="flex:1"><div style="font-weight:600;font-size:14px">${d.dish}</div>
+        <div style="font-size:12px;color:#64748b"><span style="color:${c};font-weight:600">${d.person}</span> · ${d.restaurant||'?'}${d.mealType?' · '+d.mealType:''}</div></div>
+        <div>${stars5(d.rating)}</div>
+      </div></div>`;
+  }).join('');
+
+  const dayRows = DAYS.map(day => {
+    const dd = state.dayData[day.date];
+    const dayMeals = mealsForDate(day.date);
+    const acts = dd?.activities || [];
+    if (!dd?.mood && !dayMeals.length && !acts.length) return '';
+    const mood = dd?.mood ? MOODS.find(m=>m.v===dd.mood)?.l : '';
+    return `<div style="padding:12px 0;border-bottom:1px solid #f1f5f9">
+      <div style="font-weight:700;font-size:15px;margin-bottom:4px">${day.long} ${mood||''}</div>
+      ${dd?.highlight?`<div style="color:#0891b2;font-size:13px;margin-bottom:6px">✨ ${dd.highlight}</div>`:''}
+      ${acts.length?`<div style="font-size:12px;color:#475569;margin-bottom:4px">🎯 ${acts.map(a=>a.name+(a.rating>0?' ('+a.rating+'/5)':'')).join(', ')}</div>`:''}
+      ${dayMeals.length?`<div style="font-size:12px;color:#475569">🍽 ${dayMeals.map(m=>m.restaurant+(mealAvgRating(m)>0?' ('+mealAvgRating(m).toFixed(1)+'/5)':'')).join(', ')}</div>`:''}
+      ${dd?.note?`<div style="font-size:12px;color:#94a3b8;font-style:italic;margin-top:4px">${dd.note}</div>`:''}
+    </div>`;
+  }).join('');
+
+  const mealRows = [...meals].sort((a,b)=>a.date<b.date?-1:1).map(m => {
+    const avg = mealAvgRating(m);
+    const dayInfo = DAYS.find(d=>d.date===m.date);
+    const orders = TRAVELERS.filter(t=>m.orders?.[t]?.dish).map(t => {
+      const o = m.orders[t];
+      return `<div style="display:flex;align-items:center;gap:8px;padding:4px 0">
+        <span style="font-size:12px;font-weight:600;color:${travColor(t)};min-width:60px">${t}</span>
+        <span style="font-size:13px;flex:1">${o.dish}</span>
+        ${o.rating>0?`<span style="font-size:12px;color:#f59e0b">${'★'.repeat(o.rating)}${'☆'.repeat(5-o.rating)}</span>`:''}
+      </div>`;
+    }).join('');
+    return `<div style="padding:12px 0;border-bottom:1px solid #f1f5f9">
+      <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:6px">
+        <div><div style="font-weight:700;font-size:16px">${m.restaurant||'Unnamed'}</div>
+        <div style="font-size:12px;color:#64748b">${m.mealType}${m.cuisine?' · '+m.cuisine:''}${dayInfo?' · '+dayInfo.short:''}</div></div>
+        ${avg>0?`<div style="font-family:'Outfit',sans-serif;font-size:20px;font-weight:800;color:#f59e0b">${avg.toFixed(1)}<span style="font-size:11px;color:#94a3b8">/5</span></div>`:''}
+      </div>
+      ${m.mustReturn?'<div style="display:inline-block;background:rgba(249,115,22,.1);color:#f97316;border:1px solid rgba(249,115,22,.3);border-radius:12px;padding:2px 10px;font-size:11px;font-weight:700;margin-bottom:6px">⭐ Must Return!</div>':''}
+      ${orders?`<div style="background:#f8fafc;border-radius:8px;padding:8px 10px">${orders}</div>`:''}
+      ${m.overallNotes?`<div style="font-size:12px;color:#94a3b8;font-style:italic;margin-top:6px">${m.overallNotes}</div>`:''}
+      ${m.totalBill?`<div style="font-size:12px;color:#64748b;margin-top:4px">Bill: $${m.totalBill}</div>`:''}
+    </div>`;
+  }).join('');
+
+  const wineRows = [...wines].sort((a,b)=>a.date<b.date?-1:1).map(w => {
+    const dayInfo = DAYS.find(d=>d.date===w.date);
+    return `<div style="display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid #f1f5f9">
+      <div><div style="font-weight:600;font-size:14px">🍷 ${w.name||'Unnamed'}${w.vintage?' ('+w.vintage+')':''}</div>
+      <div style="font-size:12px;color:#64748b">${w.varietal||''}${w.varietal&&w.restaurant?' · ':''}${w.restaurant||''}${dayInfo?' · '+dayInfo.short:''}</div>
+      ${w.notes?`<div style="font-size:12px;color:#94a3b8;font-style:italic">${w.notes}</div>`:''}
+      </div>
+      <div style="font-family:'Outfit',sans-serif;font-size:18px;font-weight:800;color:#7c3aed">${formatPrice(w.pricePerBottle)}</div>
+    </div>`;
+  }).join('');
+
+  const travStats = TRAVELERS.map(t => {
+    const s = pStats[t];
+    if (!s.avgRating) return '';
+    const c = travColor(t);
+    return `<div style="display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid #f1f5f9">
+      <div style="width:32px;height:32px;border-radius:50%;background:${c}22;border:2px solid ${c};display:flex;align-items:center;justify-content:center;font-weight:700;color:${c};font-size:12px;flex-shrink:0">${travInitial(t)}</div>
+      <div style="flex:1"><div style="font-weight:600;font-size:14px">${t}${isKid(t)?' 🧒':''}</div>
+      ${s.topDish?`<div style="font-size:12px;color:#64748b">Top dish: ${s.topDish.dish} @ ${s.topDish.restaurant||'?'}</div>`:''}
+      </div>
+      <div style="text-align:right"><div style="font-family:'Outfit',sans-serif;font-size:18px;font-weight:800;color:#f59e0b">${s.avgRating.toFixed(1)}</div>
+      <div style="font-size:11px;color:#94a3b8">${s.count} rated</div></div>
+    </div>`;
+  }).join('');
+
+  return `<!DOCTYPE html>
+<html><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Cabo 2026 — Trip Report</title>
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700;800&family=DM+Sans:wght@400;500&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:'DM Sans',sans-serif;background:#f0f9ff;color:#0c4a6e;-webkit-print-color-adjust:exact;print-color-adjust:exact;}
+@media print{.no-print{display:none!important;}body{background:#fff;}}
+.wrap{max-width:700px;margin:0 auto;padding:20px;}
+.print-bar{background:#0c4a6e;color:#fff;border-radius:12px;padding:12px 16px;margin-bottom:20px;display:flex;align-items:center;justify-content:space-between;gap:10px;}
+.print-bar p{font-size:13px;flex:1;}
+.print-bar button{background:#0891b2;color:#fff;border:none;border-radius:8px;padding:8px 14px;font-size:13px;font-weight:600;cursor:pointer;}
+.hero{background:linear-gradient(135deg,#0891b2,#0369a1,#f97316);border-radius:20px;padding:28px;color:#fff;margin-bottom:14px;position:relative;}
+.hero::after{content:'🌊';position:absolute;right:20px;bottom:0;font-size:80px;opacity:.12;}
+.hero h1{font-family:'Outfit',sans-serif;font-size:28px;font-weight:800;margin-bottom:4px;}
+.hero p{font-size:13px;opacity:.85;}
+.section{background:#fff;border:1px solid #bae6fd;border-radius:14px;padding:18px;margin-bottom:12px;}
+.section h3{font-size:11px;font-weight:700;color:#38bdf8;text-transform:uppercase;letter-spacing:.1em;margin-bottom:14px;}
+.stat-row{display:flex;gap:12px;margin-bottom:12px;}
+.stat-box{flex:1;background:#f0f9ff;border:1px solid #bae6fd;border-radius:10px;padding:12px;text-align:center;}
+.stat-box .num{font-family:'Outfit',sans-serif;font-size:26px;font-weight:800;color:#0891b2;}
+.stat-box .lbl{font-size:11px;color:#7dd3fc;margin-top:2px;}
+.footer{text-align:center;font-size:11px;color:#94a3b8;margin-top:16px;padding-bottom:20px;}
+</style></head><body>
+<div class="wrap">
+<div class="print-bar no-print"><p>Tap <strong>Share → Print</strong> (iPhone) or <strong>Ctrl+P</strong> to save as PDF.</p><button onclick="window.print()">🖨️ Print / Save PDF</button></div>
+
+<div class="hero">
+  <div style="font-size:11px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;opacity:.75;margin-bottom:8px">Trip Report</div>
+  <h1>Cabo 2026 🌊</h1>
+  <p>Cabo San Lucas, Mexico · May 18–30, 2026</p>
+  <p style="margin-top:4px">Robert, Nicole, Jodie, Marcos, Kristen, Quinn, Larry + Riley &amp; Morgan</p>
+</div>
+
+<div class="stat-row">
+  ${[['🍽',meals.length,'Meals Logged'],['🍷',wines.length,'Wines'],['🎯',totalActs,'Activities'],['💰',formatPrice(wStats.total),'Wine Spend']].map(([ic,v,l])=>`<div class="stat-box"><div style="font-size:20px;margin-bottom:4px">${ic}</div><div class="num">${v}</div><div class="lbl">${l}</div></div>`).join('')}
+</div>
+
+${bestRests.length?`<div class="section"><h3>🏆 Best Restaurants</h3>${restRows}</div>`:''}
+${bestDishes.length?`<div class="section"><h3>⭐ Best Dishes</h3>${dishRows}</div>`:''}
+
+${DAYS.some(d=>{const dd=state.dayData[d.date];return dd?.mood||mealsForDate(d.date).length||dd?.activities?.length;})?`<div class="section"><h3>📅 Day by Day</h3>${dayRows}</div>`:''}
+
+${meals.length?`<div class="section"><h3>🍽 Complete Meal Log</h3>${mealRows}</div>`:''}
+${wines.length?`<div class="section"><h3>🍷 Wine Log · Total: ${formatPrice(wStats.total)}</h3>${wineRows}</div>`:''}
+${travStats?`<div class="section"><h3>😋 Traveler Stats</h3>${travStats}</div>`:''}
+
+<div class="footer">Cabo 2026 Trip Report · Generated ${new Date().toLocaleDateString('en-US',{month:'long',day:'numeric',year:'numeric'})}</div>
+</div></body></html>`;
+}
+
+// ─── APP CONTROLLER ───────────────────────────────────────────────────────────
+const App = {
+  setView(v) {
+    state.view = v;
+    const navMap = { 'day-detail': 'days', 'meal-detail': 'meals' };
+    const activeNav = navMap[v] || v;
+    ['dashboard','days','meals','wine','rankings'].forEach(id => {
+      const el = document.getElementById('nav-' + id);
+      if (el) el.className = 'nav-item' + (activeNav === id ? ' active' : '');
+    });
+    document.getElementById('scrollArea').scrollTop = 0;
+    this.render();
+  },
+
+  render() {
+    const view = state.view;
+    const html = Views[view] ? Views[view]() : '';
+    document.getElementById('scrollArea').innerHTML = html;
+  },
+
+  openDayDetail(date) {
+    state.selectedDate = date;
+    this.setView('day-detail');
+  },
+
+  openMealDetail(id) {
+    state.selectedMealId = id;
+    this.setView('meal-detail');
+  },
+
+  setMealFilter(f) {
+    state.mealFilter = f;
+    this.render();
+  },
+
+  // MOOD & DAY
+  setMood(date, mood) {
+    if (!state.dayData[date]) state.dayData[date] = { activities: [], note: '', highlight: '', mood: '' };
+    state.dayData[date].mood = state.dayData[date].mood === mood ? '' : mood;
+    persist();
+    this.render();
+  },
+
+  setHighlight(date, val) {
+    if (!state.dayData[date]) return;
+    state.dayData[date].highlight = val;
+    persist();
+  },
+
+  setDayNote(date, val) {
+    if (!state.dayData[date]) return;
+    state.dayData[date].note = val;
+    persist();
+  },
+
+  // ACTIVITIES
+  openAddActivity(date) {
+    openSheet('Add Activity', buildActivitySheet(date));
+  },
+
+  setActRating(n) {
+    const cur = window._actForm.rating;
+    window._actForm.rating = cur === n ? 0 : n;
+    document.querySelectorAll('#act-stars .star').forEach((s, i) => {
+      s.className = 'star' + (i < window._actForm.rating ? ' filled' : '');
+    });
+  },
+
+  saveActivity() {
+    const f = window._actForm;
+    const name = document.getElementById('af-name')?.value?.trim() || f.name;
+    if (!name) { toast('Enter an activity name'); return; }
+    if (!state.dayData[f.date]) state.dayData[f.date] = { activities: [], note: '', highlight: '', mood: '' };
+    const act = { id: uid(), name, description: document.getElementById('af-desc')?.value || f.description, rating: f.rating, notes: document.getElementById('af-notes')?.value || f.notes };
+    state.dayData[f.date].activities.push(act);
+    persist();
+    closeSheet();
+    toast('Activity saved');
+    if (state.view === 'day-detail') this.render();
+  },
+
+  removeActivity(date, idx) {
+    if (!state.dayData[date]) return;
+    state.dayData[date].activities.splice(idx, 1);
+    persist();
+    this.render();
+    toast('Removed');
+  },
+
+  // MEALS
+  openAddMeal(date) {
+    state._addMealDate = date || null;
+    openSheet('Log a Meal', buildMealSheet());
+  },
+
+  editMeal(id) {
+    const meal = state.meals.find(m => m.id === id);
+    if (!meal) return;
+    openSheet('Edit Meal', buildMealSheet(meal), () => {
+      if (state.view === 'meal-detail') this.render();
+    });
+  },
+
+  setPersonRating(n, person) {
+    const cur = (window._mealForm.orders[person] || {}).rating || 0;
+    if (!window._mealForm.orders[person]) window._mealForm.orders[person] = { dish: '', rating: 0, notes: '' };
+    window._mealForm.orders[person].rating = cur === n ? 0 : n;
+    const r = window._mealForm.orders[person].rating;
+    document.querySelectorAll(`#pstars-${person} .star`).forEach((s, i) => {
+      s.className = 'star' + (i < r ? ' filled' : '');
+    });
+  },
+
+  toggleMustReturn() {
+    window._mealForm.mustReturn = !window._mealForm.mustReturn;
+    const btn = document.getElementById('mustReturnToggle');
+    if (btn) btn.className = 'toggle' + (window._mealForm.mustReturn ? ' on' : '');
+  },
+
+  handleMenuPhoto(input) {
+    const file = input.files?.[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = ev => {
+      window._mealForm.menuPhoto = ev.target.result;
+      const sb = document.getElementById('sheetBody');
+      if (sb) sb.innerHTML = renderMealSheetHTML();
+    };
+    reader.readAsDataURL(file);
+    input.value = '';
+  },
+
+  saveMeal() {
+    const f = window._mealForm;
+    // Sync any un-synced inputs
+    const rInp = document.getElementById('ms-restaurant');
+    if (rInp) f.restaurant = rInp.value.trim();
+    TRAVELERS.forEach(t => {
+      const inp = document.getElementById(`dish-${t}`);
+      if (inp && f.orders[t]) f.orders[t].dish = inp.value.trim();
+    });
+    const notesInp = document.getElementById('ms-notes');
+    if (notesInp) f.overallNotes = notesInp.value;
+    const billInp = document.getElementById('ms-bill');
+    if (billInp) f.totalBill = billInp.value;
+
+    if (!f.restaurant && !TRAVELERS.some(t => f.orders[t]?.dish)) {
+      toast('Add a restaurant name or at least one order');
+      return;
+    }
+
+    const meal = { id: f.id || uid(), date: f.date, restaurant: f.restaurant, cuisine: f.cuisine, mealType: f.mealType, overallNotes: f.overallNotes, totalBill: f.totalBill, mustReturn: f.mustReturn, menuPhoto: f.menuPhoto, orders: f.orders };
+
+    if (f.id) {
+      state.meals = state.meals.map(m => m.id === f.id ? meal : m);
+      toast('Meal updated');
+    } else {
+      state.meals.push(meal);
+      toast('Meal saved! 🍽');
+    }
+    persist();
+    closeSheet();
+    this.render();
+  },
+
+  deleteMeal(id) {
+    if (!confirm('Delete this meal?')) return;
+    state.meals = state.meals.filter(m => m.id !== id);
+    persist();
+    toast('Deleted');
+    this.setView('meals');
+  },
+
+  viewPhoto(mealId) {
+    const meal = state.meals.find(m => m.id === mealId);
+    if (!meal?.menuPhoto) return;
+    const overlay = document.createElement('div');
+    overlay.className = 'img-overlay';
+    overlay.innerHTML = `<img src="${meal.menuPhoto}" alt="Menu"><div style="position:absolute;top:16px;right:16px;background:rgba(0,0,0,.6);color:#fff;border:none;border-radius:50%;width:36px;height:36px;display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:18px" onclick="this.parentElement.remove()">✕</div>`;
+    overlay.onclick = e => { if (e.target === overlay || e.target.tagName === 'IMG') overlay.remove(); };
+    document.body.appendChild(overlay);
+  },
+
+  // WINE
+  openAddWine() {
+    openSheet('Log a Wine', buildWineSheet());
+  },
+
+  editWine(id) {
+    const wine = state.wines.find(w => w.id === id);
+    if (!wine) return;
+    openSheet('Edit Wine', buildWineSheet(wine));
+  },
+
+  saveWine() {
+    const f = window._wineForm;
+    const nameInp = document.getElementById('wf-name');
+    if (nameInp) f.name = nameInp.value.trim();
+    const priceInp = document.getElementById('wf-price');
+    if (priceInp) f.pricePerBottle = priceInp.value;
+    const varietalInp = document.getElementById('wf-varietal');
+    if (varietalInp) f.varietal = varietalInp.value.trim();
+    const vintInp = document.getElementById('wf-vintage');
+    if (vintInp) f.vintage = vintInp.value;
+    const restInp = document.getElementById('wf-rest');
+    if (restInp) f.restaurant = restInp.value.trim();
+    const notesInp = document.getElementById('wf-notes');
+    if (notesInp) f.notes = notesInp.value;
+
+    if (!f.name) { toast('Enter a wine name'); return; }
+
+    const wine = { id: f.id || uid(), date: f.date, name: f.name, varietal: f.varietal, vintage: f.vintage, restaurant: f.restaurant, pricePerBottle: f.pricePerBottle, notes: f.notes };
+
+    if (f.id) {
+      state.wines = state.wines.map(w => w.id === f.id ? wine : w);
+      toast('Wine updated');
+    } else {
+      state.wines.push(wine);
+      toast('Wine logged! 🍷');
+    }
+    persist();
+    closeSheet();
+    this.render();
+  },
+
+  // REPORT
+  showReport() {
+    const html = buildReport();
+    const w = window.open('', '_blank');
+    if (w) { w.document.write(html); w.document.close(); }
+    else {
+      const blob = new Blob([html], { type: 'text/html' });
+      const url = URL.createObjectURL(blob);
+      window.open(url, '_blank');
+      setTimeout(() => URL.revokeObjectURL(url), 10000);
+    }
+  }
+};
+
+// ─── INIT ─────────────────────────────────────────────────────────────────────
+App.setView('dashboard');
+</script>
+</body>
+</html>
