@@ -263,12 +263,14 @@ const SK = 'cabo2026_v2';
 // May 21–29 (9 active days; May 17-20 & May 30 are travel/transit days, excluded)
 const DAYS = (() => {
   const D = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
+  const pad = n => String(n).padStart(2,'0');
   const out = [];
   for (let i = 0; i < 9; i++) {
-    const d = new Date('2026-05-21');
-    d.setDate(d.getDate() + i);
+    // Use local time constructor (year, month 0-indexed, day) to avoid UTC offset shifting the date
+    const d = new Date(2026, 4, 21 + i); // 4 = May
+    const dateStr = `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}`;
     out.push({
-      date: d.toISOString().slice(0,10),
+      date: dateStr,
       dayNum: i + 1,
       short: `${D[d.getDay()]} May ${d.getDate()}`,
       long: `Day ${i+1} — ${D[d.getDay()]}, May ${d.getDate()}`
@@ -277,7 +279,12 @@ const DAYS = (() => {
   return out; // May 21 – May 29
 })();
 
-function todayStr()      { return new Date().toISOString().slice(0,10); }
+// Use local date (not UTC) so timezone offsets don't shift the displayed day
+function todayStr() {
+  const d = new Date();
+  const pad = n => String(n).padStart(2,'0');
+  return `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}`;
+}
 function todayDayIndex() { return DAYS.findIndex(d => d.date === todayStr()); }
 function travColor(n)    { const i = TRAVELERS.indexOf(n); return i >= 0 ? TRAV_COLORS[i] : '#94a3b8'; }
 function travInit(n)     { return (n||'?')[0].toUpperCase(); }
@@ -455,7 +462,7 @@ const Views = {
   dashboard() {
     const ti = todayDayIndex();
     const today = DAYS[ti];
-    const tripDone = new Date(todayStr()) > new Date('2026-05-29');
+    const tripDone = todayStr() > '2026-05-29';
     const totalMeals = state.meals.length;
     const totalWines = state.wines.length;
     const ws = getWineStats();
