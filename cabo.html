@@ -251,6 +251,11 @@ const KIDS   = ['Riley','Morgan'];
 const TRAVELERS = [...ADULTS, ...KIDS];
 const TRAV_COLORS = ['#6366f1','#f59e0b','#22c55e','#ec4899','#14b8a6','#c2700e','#8b5cf6','#06b6d4','#ef4444'];
 const MEAL_TYPES = ['Breakfast','Lunch','Dinner','Drinks','Snack'];
+const MEAL_DIMS = [
+  { key:'ambiance', label:'Ambiance', emoji:'🎭', hint:'Atmosphere, vibe & decor' },
+  { key:'service',  label:'Service',  emoji:'🤝', hint:'Staff & attentiveness' },
+  { key:'value',    label:'Value',    emoji:'💰', hint:'Worth the price paid?' }
+];
 const CUISINES   = ['Mexican','Seafood','Steakhouse','Italian','American','Asian','Mediterranean','International','Bar/Cantina','Other'];
 const MOODS = [{v:'amazing',l:'🤩 Amazing'},{v:'great',l:'😁 Great'},{v:'good',l:'😊 Good'},{v:'meh',l:'😐 Meh'},{v:'rough',l:'😞 Rough'}];
 const SK = 'cabo2026_v2';
@@ -322,9 +327,19 @@ function scoreDisplay(r, size='md') {
   const sz = size==='sm'?14:size==='lg'?32:20;
   return `<span style="font-family:'Outfit',sans-serif;font-size:${sz}px;font-weight:800;color:${scoreColor(r)}">${r}</span><span style="font-size:11px;color:var(--text3)">/100</span>`;
 }
-function mealAvgRating(meal) {
+function mealFoodAvg(meal) {
   const rs = TRAVELERS.map(t=>meal.orders?.[t]?.rating).filter(r=>typeof r==='number');
   return rs.length ? Math.round(rs.reduce((a,b)=>a+b,0)/rs.length) : null;
+}
+function mealAvgRating(meal) {
+  // Weighted aggregate: food scores (weight 2) + each venue dimension (weight 1)
+  const scores = [];
+  const food = mealFoodAvg(meal);
+  if (food !== null) scores.push({ v: food, w: 2 });
+  MEAL_DIMS.forEach(d => { if (typeof meal[d.key] === 'number') scores.push({ v: meal[d.key], w: 1 }); });
+  if (!scores.length) return null;
+  const tw = scores.reduce((s,x)=>s+x.w, 0);
+  return Math.round(scores.reduce((s,x)=>s+x.v*x.w, 0) / tw);
 }
 function uid() { return Math.random().toString(36).slice(2)+Date.now().toString(36); }
 function formatPrice(p) { const n=parseFloat(p); return isNaN(n)?'—':'$'+n.toFixed(2).replace(/\.00$/,''); }
@@ -406,6 +421,20 @@ function actScoreHTML() {
       <div style="font-size:9px;color:var(--text3)">/100</div>
     </div>
     <button onclick="App.clearActRating()" style="background:none;border:none;color:var(--text3);cursor:pointer;font-size:16px;padding:4px;line-height:1">✕</button>`;
+}
+
+function dimScoreHTML(key) {
+  const r = window._mealForm?.[key];
+  if (r === null || r === undefined) {
+    return `<button onclick="App.activateDimRating('${key}')" class="btn btn-sm" style="background:var(--primary);color:#fff;padding:4px 9px;font-size:11px;border-radius:7px">Rate</button>
+      <span style="font-size:11px;color:var(--text3)">optional</span>`;
+  }
+  const c = scoreColor(r);
+  return `<input type="range" min="0" max="100" value="${r}"
+      oninput="App.updateDimRating(this.value,'${key}')"
+      style="flex:1;accent-color:var(--primary);">
+    <span id="dsv-${key}" style="font-family:'Outfit',sans-serif;font-weight:800;font-size:15px;color:${c};min-width:22px;text-align:right">${r}</span>
+    <button onclick="App.clearDimRating('${key}')" style="background:none;border:none;color:var(--text3);cursor:pointer;font-size:15px;padding:2px;line-height:1">✕</button>`;
 }
 
 // ── SHARED TABLE ITEMS ────────────────────────────────────────────────────────
@@ -697,9 +726,12 @@ const Views = {
             </div>
             ${meal.totalBill?`<div style="font-size:13px;color:var(--text3);margin-top:6px">💰 Total bill: <strong style="color:var(--text)">$${meal.totalBill}</strong></div>`:''}
           </div>
-          ${avg!==null?`<div style="text-align:center;flex-shrink:0">
+          ${avg!==null?`<div style="text-align:right;flex-shrink:0">
             <div style="font-family:'Outfit',sans-serif;font-size:40px;font-weight:800;color:${scoreColor(avg)};line-height:1">${avg}</div>
-            <div style="font-size:11px;color:var(--text3)">group avg / 100</div></div>`:''}
+            <div style="font-size:11px;color:var(--text3);margin-bottom:6px">overall / 100</div>
+            ${[{k:'food',l:'Food',v:mealFoodAvg(meal)},...MEAL_DIMS.map(d=>({k:d.key,l:d.label,v:meal[d.key]??null}))].filter(x=>x.v!==null).map(x=>`
+              <div style="font-size:11px;color:${scoreColor(x.v)};font-weight:600;text-align:right">${x.l}: ${x.v}</div>`).join('')}
+          </div>`:''}
         </div></div>
       ${meal.menuPhoto?`<div class="card" style="margin-bottom:10px;padding:10px">
         <div class="section-label">Menu Photo</div>
@@ -888,6 +920,9 @@ function buildMealSheet(prefill = {}) {
     totalBill: prefill.totalBill || '',
     mustReturn: prefill.mustReturn || false,
     menuPhoto: prefill.menuPhoto || null,
+    ambiance: prefill.ambiance ?? null,
+    service:  prefill.service  ?? null,
+    value:    prefill.value    ?? null,
     sharedItems: prefill.sharedItems ? JSON.parse(JSON.stringify(prefill.sharedItems)) : [],
     orders: {}
   };
@@ -946,6 +981,19 @@ function renderMealSheetHTML() {
       </div>
     </div>
     <div class="field"><label>Menu Photo (Reference)</label>${photoSec}</div>
+
+    <div class="section-label" style="margin-top:4px">Venue Scores</div>
+    <div style="background:var(--bg);border-radius:12px;padding:4px 12px 8px;margin-bottom:14px">
+      ${MEAL_DIMS.map(d=>`
+      <div style="display:flex;align-items:center;gap:10px;padding:10px 0;border-bottom:1px solid var(--border2)">
+        <div style="min-width:76px">
+          <div style="font-size:13px;font-weight:600;color:var(--text2)">${d.emoji} ${d.label}</div>
+          <div style="font-size:10px;color:var(--text3)">${d.hint}</div>
+        </div>
+        <div id="vscore-wrap-${d.key}" style="flex:1;display:flex;align-items:center;gap:8px">${dimScoreHTML(d.key)}</div>
+      </div>`).join('')}
+      <div style="font-size:11px;color:var(--text3);padding:8px 0 2px">These combine with individual food scores for the restaurant's overall ranking</div>
+    </div>
 
     <div class="section-label" style="margin-top:4px">Shared for the Table</div>
     <div style="background:var(--bg);border-radius:12px;padding:10px 12px;margin-bottom:14px">
@@ -1094,6 +1142,7 @@ function buildReport() {
         ${avg!==null?`<div style="font-family:'Outfit',sans-serif;font-size:22px;font-weight:800;color:${avg>=85?'#5d7a28':avg>=70?'#c2700e':'#c4950a'}">${avg}<span style="font-size:12px;color:#94a3b8">/100</span></div>`:''}
       </div>
       ${m.mustReturn?'<div style="display:inline-block;background:rgba(194,112,14,.1);color:#c2700e;border:1px solid rgba(194,112,14,.3);border-radius:12px;padding:2px 10px;font-size:11px;font-weight:700;margin-bottom:6px">⭐ Must Return!</div>':''}
+      ${[{l:'🎭 Ambiance',v:m.ambiance},{l:'🤝 Service',v:m.service},{l:'💰 Value',v:m.value}].filter(x=>x.v!==null&&x.v!==undefined).length?`<div style="display:flex;gap:10px;margin-bottom:6px;flex-wrap:wrap">${[{l:'🎭 Ambiance',v:m.ambiance},{l:'🤝 Service',v:m.service},{l:'💰 Value',v:m.value}].filter(x=>typeof x.v==='number').map(x=>`<span style="font-size:12px;color:#64748b">${x.l}: <strong style="color:${x.v>=85?'#5d7a28':x.v>=70?'#c2700e':'#c4950a'}">${x.v}/100</strong></span>`).join('')}</div>`:''}
       ${m.sharedItems?.length?`<div style="font-size:12px;color:#6b3a1f;margin-bottom:6px">🫱 Shared: <strong>${m.sharedItems.map(i=>i.name).join(', ')}</strong></div>`:''}
       ${orders?`<div style="background:#f8fafc;border-radius:8px;padding:8px 10px">${orders}</div>`:''}
       ${m.overallNotes?`<div style="font-size:12px;color:#94a3b8;font-style:italic;margin-top:6px">${m.overallNotes}</div>`:''}
@@ -1215,6 +1264,23 @@ const App = {
     const el = document.getElementById('act-score-wrap');
     if (el) el.innerHTML = actScoreHTML();
   },
+
+  // Venue dimension ratings
+  activateDimRating(key) {
+    window._mealForm[key] = 75;
+    const el = document.getElementById(`vscore-wrap-${key}`);
+    if (el) el.innerHTML = dimScoreHTML(key);
+  },
+  updateDimRating(val, key) {
+    window._mealForm[key] = parseInt(val);
+    const el = document.getElementById(`dsv-${key}`);
+    if (el) { const r=parseInt(val); el.textContent=r; el.style.color=scoreColor(r); }
+  },
+  clearDimRating(key) {
+    window._mealForm[key] = null;
+    const el = document.getElementById(`vscore-wrap-${key}`);
+    if (el) el.innerHTML = dimScoreHTML(key);
+  },
   saveActivity() {
     const f = window._actForm;
     const name = (document.getElementById('af-name')?.value||f.name).trim();
@@ -1310,7 +1376,7 @@ const App = {
     const notesInp=document.getElementById('ms-notes'); if(notesInp) f.overallNotes=notesInp.value;
     const billInp=document.getElementById('ms-bill'); if(billInp) f.totalBill=billInp.value;
     if (!f.restaurant && !TRAVELERS.some(t=>f.orders[t]?.dish)) { toast('Add a restaurant or at least one order'); return; }
-    const meal={id:f.id||uid(),date:f.date,restaurant:f.restaurant,cuisine:f.cuisine,mealType:f.mealType,overallNotes:f.overallNotes,totalBill:f.totalBill,mustReturn:f.mustReturn,menuPhoto:f.menuPhoto,sharedItems:f.sharedItems.filter(i=>i.name?.trim()),orders:f.orders};
+    const meal={id:f.id||uid(),date:f.date,restaurant:f.restaurant,cuisine:f.cuisine,mealType:f.mealType,overallNotes:f.overallNotes,totalBill:f.totalBill,mustReturn:f.mustReturn,menuPhoto:f.menuPhoto,ambiance:f.ambiance,service:f.service,value:f.value,sharedItems:f.sharedItems.filter(i=>i.name?.trim()),orders:f.orders};
     if (f.id) { state.meals=state.meals.map(m=>m.id===f.id?meal:m); toast('Meal updated'); }
     else { state.meals.push(meal); toast('Meal saved! 🍽'); }
     persist(); closeSheet(); this.render();
