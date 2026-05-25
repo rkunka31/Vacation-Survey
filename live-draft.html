@@ -1,0 +1,998 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Dynasty Draft">
+<meta name="theme-color" content="#1e293b">
+<title>Dynasty Draft Dashboard</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #0f172a;
+  --surface: #1e293b;
+  --surface2: #263249;
+  --surface3: #2d3a50;
+  --border: #334155;
+  --border2: #3f4f65;
+  --text: #f1f5f9;
+  --text2: #94a3b8;
+  --text3: #64748b;
+  --accent: #3b82f6;
+  --accent2: #2563eb;
+  --green: #22c55e;
+  --red: #ef4444;
+  --amber: #f59e0b;
+  --orange: #f97316;
+  --purple: #a855f7;
+  --teal: #14b8a6;
+  --pink: #ec4899;
+  --qb: #ef4444;
+  --rb: #22c55e;
+  --wr: #3b82f6;
+  --te: #f59e0b;
+  --k: #a855f7;
+  --def: #64748b;
+}
+* { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+html, body { height: 100%; background: var(--bg); color: var(--text); font-family: 'DM Sans', system-ui, sans-serif; font-size: 14px; overflow: hidden; }
+
+/* ── SETUP MODAL ── */
+#setup-overlay {
+  position: fixed; inset: 0; background: rgba(0,0,0,0.85); z-index: 100;
+  display: flex; align-items: center; justify-content: center;
+  backdrop-filter: blur(4px);
+}
+#setup-modal {
+  background: var(--surface); border: 1px solid var(--border2);
+  border-radius: 16px; padding: 32px; width: min(560px, calc(100vw - 32px));
+  max-height: calc(100vh - 48px); overflow-y: auto;
+}
+#setup-modal h1 { font-family: 'Outfit', sans-serif; font-size: 24px; font-weight: 800; margin-bottom: 4px; }
+#setup-modal .subtitle { color: var(--text2); margin-bottom: 24px; }
+.form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 12px; }
+.form-row.full { grid-template-columns: 1fr; }
+label { display: block; font-size: 12px; font-weight: 500; color: var(--text2); text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 4px; }
+input[type=text], input[type=number], select {
+  width: 100%; background: var(--surface2); border: 1px solid var(--border);
+  border-radius: 8px; padding: 8px 12px; color: var(--text); font-size: 14px; font-family: inherit;
+  outline: none; transition: border-color 0.15s;
+}
+input:focus, select:focus { border-color: var(--accent); }
+select option { background: var(--surface2); }
+#teams-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 8px; }
+.team-input-row { display: flex; align-items: center; gap: 6px; }
+.team-num { font-size: 11px; color: var(--text3); width: 20px; flex-shrink: 0; text-align: right; }
+.setup-section { margin-top: 20px; }
+.setup-section h3 { font-size: 13px; font-weight: 600; color: var(--text2); text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 10px; }
+.btn { display: inline-flex; align-items: center; justify-content: center; gap: 6px; padding: 10px 20px; border-radius: 8px; border: none; cursor: pointer; font-size: 14px; font-weight: 600; font-family: inherit; transition: all 0.15s; }
+.btn-primary { background: var(--accent); color: #fff; }
+.btn-primary:hover { background: var(--accent2); }
+.btn-secondary { background: var(--surface2); color: var(--text); border: 1px solid var(--border2); }
+.btn-secondary:hover { background: var(--surface3); }
+.btn-danger { background: #7f1d1d; color: #fca5a5; border: 1px solid #991b1b; }
+.btn-danger:hover { background: #991b1b; }
+.btn-sm { padding: 6px 12px; font-size: 13px; }
+.btn-xs { padding: 4px 8px; font-size: 12px; border-radius: 6px; }
+.btn-icon { padding: 6px; border-radius: 6px; background: var(--surface2); border: 1px solid var(--border); color: var(--text2); cursor: pointer; transition: all 0.15s; }
+.btn-icon:hover { background: var(--surface3); color: var(--text); }
+.setup-actions { display: flex; gap: 10px; justify-content: flex-end; margin-top: 24px; flex-wrap: wrap; }
+
+/* ── MAIN APP ── */
+#app { height: 100%; display: flex; flex-direction: column; }
+
+/* HEADER */
+#header {
+  background: var(--surface); border-bottom: 1px solid var(--border);
+  padding: 0 16px; height: 56px; display: flex; align-items: center; gap: 12px; flex-shrink: 0;
+}
+#header .league-name { font-family: 'Outfit', sans-serif; font-size: 16px; font-weight: 700; margin-right: 4px; }
+#pick-info { display: flex; align-items: center; gap: 8px; flex: 1; }
+.pick-badge {
+  background: var(--surface2); border: 1px solid var(--border2);
+  border-radius: 6px; padding: 3px 10px; font-size: 12px; font-weight: 600; color: var(--text2);
+}
+.on-clock {
+  font-size: 13px; font-weight: 600;
+  background: var(--surface2); border: 1px solid var(--border2);
+  border-radius: 8px; padding: 4px 12px; color: var(--text);
+}
+.on-clock span { color: var(--accent); }
+#timer-display {
+  font-family: 'Outfit', monospace; font-size: 20px; font-weight: 700;
+  min-width: 60px; text-align: center;
+}
+#timer-display.warning { color: var(--amber); }
+#timer-display.danger { color: var(--red); animation: pulse 0.5s ease-in-out infinite alternate; }
+@keyframes pulse { from { opacity: 1; } to { opacity: 0.5; } }
+.header-actions { display: flex; align-items: center; gap: 6px; }
+.draft-status { display: flex; align-items: center; gap: 6px; font-size: 12px; font-weight: 600; }
+.status-dot { width: 7px; height: 7px; border-radius: 50%; background: var(--green); box-shadow: 0 0 6px var(--green); }
+.status-dot.paused { background: var(--amber); box-shadow: 0 0 6px var(--amber); }
+.status-dot.done { background: var(--text3); box-shadow: none; }
+
+/* BODY */
+#body { flex: 1; display: flex; overflow: hidden; }
+
+/* PLAYER POOL */
+#player-pool {
+  width: 280px; flex-shrink: 0;
+  background: var(--surface); border-right: 1px solid var(--border);
+  display: flex; flex-direction: column;
+}
+#pool-header { padding: 12px; border-bottom: 1px solid var(--border); }
+#pool-header h2 { font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.06em; color: var(--text2); margin-bottom: 8px; }
+#player-search {
+  width: 100%; background: var(--surface2); border: 1px solid var(--border);
+  border-radius: 8px; padding: 7px 10px 7px 30px; color: var(--text); font-size: 13px; font-family: inherit;
+  outline: none; position: relative;
+}
+#player-search:focus { border-color: var(--accent); }
+.search-wrap { position: relative; }
+.search-icon { position: absolute; left: 8px; top: 50%; transform: translateY(-50%); color: var(--text3); pointer-events: none; }
+.pos-filters { display: flex; gap: 4px; flex-wrap: wrap; margin-top: 8px; }
+.pos-btn {
+  padding: 3px 8px; border-radius: 5px; border: 1px solid var(--border); background: transparent;
+  font-size: 11px; font-weight: 700; cursor: pointer; transition: all 0.15s; font-family: inherit;
+  color: var(--text2);
+}
+.pos-btn.active { color: #fff; border-color: transparent; }
+.pos-btn[data-pos="ALL"].active { background: var(--accent); }
+.pos-btn[data-pos="QB"].active { background: var(--qb); }
+.pos-btn[data-pos="RB"].active { background: var(--rb); }
+.pos-btn[data-pos="WR"].active { background: var(--wr); }
+.pos-btn[data-pos="TE"].active { background: var(--te); color: #000; }
+.pos-btn[data-pos="K"].active  { background: var(--k); }
+.pos-btn[data-pos="DEF"].active { background: var(--def); }
+#player-list { flex: 1; overflow-y: auto; padding: 6px; }
+.player-card {
+  display: flex; align-items: center; gap: 8px; padding: 7px 8px;
+  border-radius: 7px; cursor: pointer; transition: background 0.1s; margin-bottom: 2px;
+}
+.player-card:hover { background: var(--surface2); }
+.player-card.drafted { opacity: 0.35; pointer-events: none; }
+.pos-pill {
+  font-size: 10px; font-weight: 800; padding: 2px 5px; border-radius: 4px; flex-shrink: 0;
+  letter-spacing: 0.03em; min-width: 28px; text-align: center;
+}
+.pos-QB { background: rgba(239,68,68,0.2); color: #f87171; }
+.pos-RB { background: rgba(34,197,94,0.2); color: #4ade80; }
+.pos-WR { background: rgba(59,130,246,0.2); color: #60a5fa; }
+.pos-TE { background: rgba(245,158,11,0.2); color: #fcd34d; }
+.pos-K  { background: rgba(168,85,247,0.2); color: #c084fc; }
+.pos-DEF{ background: rgba(100,116,139,0.2); color: #94a3b8; }
+.player-info { flex: 1; min-width: 0; }
+.player-name { font-size: 13px; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.player-meta { font-size: 11px; color: var(--text3); }
+.player-tier { font-size: 11px; color: var(--text3); flex-shrink: 0; }
+.tier-badge { font-size: 10px; font-weight: 700; padding: 1px 4px; border-radius: 3px; background: var(--surface3); }
+.pool-count { padding: 8px 12px; border-top: 1px solid var(--border); font-size: 11px; color: var(--text3); }
+
+/* DRAFT BOARD */
+#board-wrap { flex: 1; display: flex; flex-direction: column; overflow: hidden; }
+#board-header { padding: 10px 14px; border-bottom: 1px solid var(--border); display: flex; align-items: center; gap: 8px; flex-shrink: 0; }
+#board-header h2 { font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.06em; color: var(--text2); }
+#board-scroll { flex: 1; overflow: auto; padding: 10px; }
+#draft-board {
+  display: grid; gap: 2px; min-width: max-content;
+}
+.board-header-row { display: contents; }
+.board-th {
+  padding: 6px 10px; background: var(--surface2); border-radius: 6px;
+  font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em;
+  color: var(--text2); text-align: center; white-space: nowrap; position: sticky; top: 0; z-index: 2;
+}
+.board-th.round-label { color: var(--text3); text-align: right; }
+.board-cell {
+  min-width: 110px; height: 52px; border-radius: 6px; background: var(--surface2);
+  border: 1px solid var(--border); display: flex; flex-direction: column;
+  justify-content: center; padding: 4px 8px; transition: all 0.15s; overflow: hidden;
+}
+.board-cell.on-clock-cell {
+  border-color: var(--accent); box-shadow: 0 0 0 1px var(--accent), 0 0 12px rgba(59,130,246,0.3);
+  animation: clockPulse 1.5s ease-in-out infinite;
+}
+@keyframes clockPulse {
+  0%, 100% { box-shadow: 0 0 0 1px var(--accent), 0 0 8px rgba(59,130,246,0.2); }
+  50% { box-shadow: 0 0 0 1px var(--accent), 0 0 16px rgba(59,130,246,0.5); }
+}
+.board-cell.filled { background: var(--surface2); }
+.board-cell .cell-pick { font-size: 10px; color: var(--text3); }
+.board-cell .cell-player { font-size: 12px; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.board-cell .cell-pos { font-size: 10px; font-weight: 700; }
+.board-cell .cell-team { font-size: 10px; color: var(--text3); }
+.board-round-num {
+  padding: 4px 8px; font-size: 11px; font-weight: 600; color: var(--text3);
+  display: flex; align-items: center; justify-content: flex-end; white-space: nowrap;
+}
+
+/* DRAFT LOG */
+#log-panel {
+  width: 240px; flex-shrink: 0;
+  background: var(--surface); border-left: 1px solid var(--border);
+  display: flex; flex-direction: column;
+}
+#log-header { padding: 12px; border-bottom: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; }
+#log-header h2 { font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.06em; color: var(--text2); }
+#log-list { flex: 1; overflow-y: auto; padding: 6px; }
+.log-item {
+  padding: 6px 8px; border-radius: 6px; margin-bottom: 3px;
+  border: 1px solid var(--border); background: var(--surface2);
+}
+.log-item.latest { border-color: var(--accent); background: rgba(59,130,246,0.08); }
+.log-pick { font-size: 10px; color: var(--text3); margin-bottom: 1px; }
+.log-player { font-size: 12px; font-weight: 600; }
+.log-team { font-size: 11px; color: var(--text2); }
+
+/* CONFIRM DIALOG */
+#confirm-overlay {
+  position: fixed; inset: 0; background: rgba(0,0,0,0.7); z-index: 50;
+  display: none; align-items: center; justify-content: center;
+}
+#confirm-overlay.show { display: flex; }
+#confirm-box {
+  background: var(--surface); border: 1px solid var(--border2);
+  border-radius: 12px; padding: 24px; width: min(380px, calc(100vw - 32px));
+}
+#confirm-box h3 { font-size: 16px; font-weight: 700; margin-bottom: 6px; }
+#confirm-box p { color: var(--text2); margin-bottom: 16px; font-size: 13px; }
+.confirm-actions { display: flex; gap: 8px; justify-content: flex-end; }
+
+/* COMPLETE BANNER */
+#complete-banner {
+  display: none; position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%);
+  background: var(--green); color: #fff; font-weight: 700; padding: 12px 24px;
+  border-radius: 10px; font-size: 15px; z-index: 40; white-space: nowrap;
+  box-shadow: 0 4px 20px rgba(34,197,94,0.4);
+}
+
+/* TOAST */
+#toast {
+  position: fixed; bottom: 20px; right: 20px; background: var(--surface); border: 1px solid var(--border2);
+  border-radius: 8px; padding: 10px 16px; font-size: 13px; z-index: 60;
+  transform: translateY(60px); opacity: 0; transition: all 0.25s; pointer-events: none;
+}
+#toast.show { transform: translateY(0); opacity: 1; }
+
+/* SCROLLBAR */
+::-webkit-scrollbar { width: 5px; height: 5px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: var(--border2); border-radius: 10px; }
+
+/* RESPONSIVE */
+@media (max-width: 900px) {
+  #player-pool { width: 220px; }
+  #log-panel { width: 190px; }
+}
+@media (max-width: 700px) {
+  #log-panel { display: none; }
+  #player-pool { width: 200px; }
+}
+</style>
+</head>
+<body>
+
+<!-- SETUP OVERLAY -->
+<div id="setup-overlay">
+  <div id="setup-modal">
+    <h1>⚡ Dynasty Draft</h1>
+    <p class="subtitle">Configure your draft settings to get started</p>
+
+    <div class="form-row">
+      <div>
+        <label>League Name</label>
+        <input type="text" id="cfg-name" value="Dynasty League 2025" placeholder="League name">
+      </div>
+      <div>
+        <label>Draft Type</label>
+        <select id="cfg-type">
+          <option value="snake">Snake</option>
+          <option value="linear">Linear</option>
+          <option value="3rd-round-reversal">3rd Round Reversal</option>
+        </select>
+      </div>
+    </div>
+    <div class="form-row">
+      <div>
+        <label>Number of Teams</label>
+        <select id="cfg-teams" onchange="renderTeamInputs()">
+          <option value="8">8 Teams</option>
+          <option value="10">10 Teams</option>
+          <option value="12" selected>12 Teams</option>
+          <option value="14">14 Teams</option>
+          <option value="16">16 Teams</option>
+        </select>
+      </div>
+      <div>
+        <label>Rounds</label>
+        <select id="cfg-rounds">
+          <option value="5">5</option>
+          <option value="10">10</option>
+          <option value="15">15</option>
+          <option value="20">20</option>
+          <option value="25" selected>25</option>
+          <option value="30">30</option>
+        </select>
+      </div>
+    </div>
+    <div class="form-row">
+      <div>
+        <label>Timer Per Pick</label>
+        <select id="cfg-timer">
+          <option value="0">No Timer</option>
+          <option value="60">60 seconds</option>
+          <option value="90" selected>90 seconds</option>
+          <option value="120">2 minutes</option>
+          <option value="180">3 minutes</option>
+          <option value="300">5 minutes</option>
+        </select>
+      </div>
+      <div>
+        <label>Your Team # (optional)</label>
+        <select id="cfg-my-team">
+          <option value="0">Spectator</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="setup-section">
+      <h3>Team Names</h3>
+      <div id="teams-grid"></div>
+    </div>
+
+    <div class="setup-section">
+      <h3>Draft Order (Team Numbers, comma-separated)</h3>
+      <div class="form-row full">
+        <div>
+          <label>Round 1 Order</label>
+          <input type="text" id="cfg-order" placeholder="e.g. 1,2,3,4,5,6,7,8,9,10,11,12">
+        </div>
+      </div>
+      <p style="font-size:12px;color:var(--text3);margin-top:4px;">Leave blank to use 1–N order. Snake/reversal will mirror automatically.</p>
+    </div>
+
+    <div class="setup-actions">
+      <button class="btn btn-secondary btn-sm" onclick="loadSaved()">Load Saved Draft</button>
+      <button class="btn btn-primary" onclick="startDraft()">Start Draft →</button>
+    </div>
+  </div>
+</div>
+
+<!-- CONFIRM DIALOG -->
+<div id="confirm-overlay">
+  <div id="confirm-box">
+    <h3 id="confirm-title">Confirm Pick</h3>
+    <p id="confirm-body"></p>
+    <div class="confirm-actions">
+      <button class="btn btn-secondary btn-sm" onclick="closeConfirm()">Cancel</button>
+      <button class="btn btn-primary btn-sm" id="confirm-ok" onclick="confirmPick()">Draft Player</button>
+    </div>
+  </div>
+</div>
+
+<!-- COMPLETE BANNER -->
+<div id="complete-banner">🏆 Draft Complete!</div>
+
+<!-- TOAST -->
+<div id="toast"></div>
+
+<!-- MAIN APP -->
+<div id="app" style="display:none;">
+  <!-- HEADER -->
+  <div id="header">
+    <span class="league-name" id="hdr-league">Dynasty League</span>
+    <div id="pick-info">
+      <span class="pick-badge" id="hdr-pick">Pick 1.01</span>
+      <span class="on-clock">On the clock: <span id="hdr-team">—</span></span>
+    </div>
+    <div class="draft-status">
+      <div class="status-dot" id="status-dot"></div>
+      <span id="status-text">Live</span>
+    </div>
+    <div id="timer-display" style="display:none;">1:30</div>
+    <div class="header-actions">
+      <button class="btn btn-secondary btn-xs" onclick="undoPick()" id="btn-undo" title="Undo last pick">↩ Undo</button>
+      <button class="btn btn-secondary btn-xs" id="btn-timer-toggle" onclick="toggleTimer()" style="display:none;">⏸ Pause</button>
+      <button class="btn btn-secondary btn-xs" onclick="exportDraft()">⬇ Export</button>
+      <button class="btn btn-secondary btn-xs" onclick="resetDraft()">⚙ Reset</button>
+    </div>
+  </div>
+
+  <!-- BODY -->
+  <div id="body">
+    <!-- PLAYER POOL -->
+    <div id="player-pool">
+      <div id="pool-header">
+        <h2>Available Players</h2>
+        <div class="search-wrap">
+          <svg class="search-icon" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+          <input type="text" id="player-search" placeholder="Search players…" oninput="renderPlayerList()">
+        </div>
+        <div class="pos-filters">
+          <button class="pos-btn active" data-pos="ALL" onclick="setFilter('ALL')">All</button>
+          <button class="pos-btn" data-pos="QB" onclick="setFilter('QB')">QB</button>
+          <button class="pos-btn" data-pos="RB" onclick="setFilter('RB')">RB</button>
+          <button class="pos-btn" data-pos="WR" onclick="setFilter('WR')">WR</button>
+          <button class="pos-btn" data-pos="TE" onclick="setFilter('TE')">TE</button>
+          <button class="pos-btn" data-pos="K" onclick="setFilter('K')">K</button>
+          <button class="pos-btn" data-pos="DEF" onclick="setFilter('DEF')">DEF</button>
+        </div>
+      </div>
+      <div id="player-list"></div>
+      <div class="pool-count" id="pool-count"></div>
+    </div>
+
+    <!-- DRAFT BOARD -->
+    <div id="board-wrap">
+      <div id="board-header">
+        <h2>Draft Board</h2>
+      </div>
+      <div id="board-scroll">
+        <div id="draft-board"></div>
+      </div>
+    </div>
+
+    <!-- DRAFT LOG -->
+    <div id="log-panel">
+      <div id="log-header">
+        <h2>Draft Log</h2>
+        <span id="log-count" style="font-size:11px;color:var(--text3);">0 picks</span>
+      </div>
+      <div id="log-list"></div>
+    </div>
+  </div>
+</div>
+
+<script>
+// ─────────────────────────────────────────────
+// PLAYER DATABASE
+// ─────────────────────────────────────────────
+const PLAYERS = [
+  // QBs
+  {id:1,  name:'Patrick Mahomes',  pos:'QB', nfl:'KC',  age:29, tier:1},
+  {id:2,  name:'Josh Allen',       pos:'QB', nfl:'BUF', age:28, tier:1},
+  {id:3,  name:'Lamar Jackson',    pos:'QB', nfl:'BAL', age:27, tier:1},
+  {id:4,  name:'Jalen Hurts',      pos:'QB', nfl:'PHI', age:26, tier:1},
+  {id:5,  name:'C.J. Stroud',      pos:'QB', nfl:'HOU', age:24, tier:2},
+  {id:6,  name:'Anthony Richardson',pos:'QB',nfl:'IND', age:23, tier:2},
+  {id:7,  name:'Caleb Williams',   pos:'QB', nfl:'CHI', age:23, tier:2},
+  {id:8,  name:'Jayden Daniels',   pos:'QB', nfl:'WSH', age:24, tier:2},
+  {id:9,  name:'Joe Burrow',       pos:'QB', nfl:'CIN', age:28, tier:2},
+  {id:10, name:'Dak Prescott',     pos:'QB', nfl:'DAL', age:31, tier:3},
+  {id:11, name:'Brock Purdy',      pos:'QB', nfl:'SF',  age:25, tier:3},
+  {id:12, name:'Tua Tagovailoa',   pos:'QB', nfl:'MIA', age:27, tier:3},
+  {id:13, name:'Jordan Love',      pos:'QB', nfl:'GB',  age:27, tier:3},
+  {id:14, name:'Drake Maye',       pos:'QB', nfl:'NE',  age:23, tier:3},
+  {id:15, name:'Bo Nix',           pos:'QB', nfl:'DEN', age:25, tier:4},
+  {id:16, name:'Sam Darnold',      pos:'QB', nfl:'MIN', age:27, tier:4},
+  // RBs
+  {id:50, name:'Christian McCaffrey',pos:'RB',nfl:'SF', age:28, tier:1},
+  {id:51, name:'Breece Hall',      pos:'RB', nfl:'NYJ', age:24, tier:1},
+  {id:52, name:'Bijan Robinson',   pos:'RB', nfl:'ATL', age:23, tier:1},
+  {id:53, name:'Jahmyr Gibbs',     pos:'RB', nfl:'DET', age:23, tier:1},
+  {id:54, name:'De\'Von Achane',   pos:'RB', nfl:'MIA', age:23, tier:1},
+  {id:55, name:'Jonathon Brooks',  pos:'RB', nfl:'CAR', age:22, tier:2},
+  {id:56, name:'Kyren Williams',   pos:'RB', nfl:'LAR', age:25, tier:2},
+  {id:57, name:'Josh Jacobs',      pos:'RB', nfl:'GB',  age:27, tier:2},
+  {id:58, name:'Tony Pollard',     pos:'RB', nfl:'TEN', age:27, tier:2},
+  {id:59, name:'James Cook',       pos:'RB', nfl:'BUF', age:25, tier:2},
+  {id:60, name:'Rachaad White',    pos:'RB', nfl:'TB',  age:26, tier:2},
+  {id:61, name:'Isiah Pacheco',    pos:'RB', nfl:'KC',  age:25, tier:2},
+  {id:62, name:'Zach Charbonnet',  pos:'RB', nfl:'SEA', age:24, tier:3},
+  {id:63, name:'Tyjae Spears',     pos:'RB', nfl:'TEN', age:23, tier:3},
+  {id:64, name:'Jaylen Warren',    pos:'RB', nfl:'PIT', age:25, tier:3},
+  {id:65, name:'David Montgomery', pos:'RB', nfl:'DET', age:27, tier:3},
+  {id:66, name:'Aaron Jones',      pos:'RB', nfl:'MIN', age:30, tier:3},
+  {id:67, name:'Chuba Hubbard',    pos:'RB', nfl:'CAR', age:26, tier:3},
+  {id:68, name:'Derrick Henry',    pos:'RB', nfl:'BAL', age:31, tier:3},
+  {id:69, name:'Jonathan Taylor',  pos:'RB', nfl:'IND', age:26, tier:3},
+  {id:70, name:'Travis Etienne',   pos:'RB', nfl:'JAX', age:26, tier:4},
+  {id:71, name:'Miles Sanders',    pos:'RB', nfl:'CAR', age:28, tier:4},
+  {id:72, name:'Zamir White',      pos:'RB', nfl:'LV',  age:25, tier:4},
+  // WRs
+  {id:100,name:'Justin Jefferson',  pos:'WR', nfl:'MIN', age:26, tier:1},
+  {id:101,name:'Ja\'Marr Chase',    pos:'WR', nfl:'CIN', age:25, tier:1},
+  {id:102,name:'CeeDee Lamb',       pos:'WR', nfl:'DAL', age:26, tier:1},
+  {id:103,name:'Puka Nacua',        pos:'WR', nfl:'LAR', age:24, tier:1},
+  {id:104,name:'Amon-Ra St. Brown', pos:'WR', nfl:'DET', age:25, tier:1},
+  {id:105,name:'Marvin Harrison Jr.',pos:'WR',nfl:'ARI', age:22, tier:1},
+  {id:106,name:'Malik Nabers',      pos:'WR', nfl:'NYG', age:22, tier:2},
+  {id:107,name:'Brian Thomas Jr.',  pos:'WR', nfl:'JAX', age:23, tier:2},
+  {id:108,name:'Tyreek Hill',       pos:'WR', nfl:'MIA', age:31, tier:2},
+  {id:109,name:'Stefon Diggs',      pos:'WR', nfl:'HOU', age:31, tier:2},
+  {id:110,name:'Davante Adams',     pos:'WR', nfl:'NYJ', age:32, tier:2},
+  {id:111,name:'DeVonta Smith',     pos:'WR', nfl:'PHI', age:27, tier:2},
+  {id:112,name:'Jaylen Waddle',     pos:'WR', nfl:'MIA', age:26, tier:2},
+  {id:113,name:'Garrett Wilson',    pos:'WR', nfl:'NYJ', age:25, tier:2},
+  {id:114,name:'Chris Olave',       pos:'WR', nfl:'NO',  age:25, tier:2},
+  {id:115,name:'Jordan Addison',    pos:'WR', nfl:'MIN', age:23, tier:2},
+  {id:116,name:'Jaxon Smith-Njigba',pos:'WR', nfl:'SEA', age:23, tier:2},
+  {id:117,name:'A.J. Brown',        pos:'WR', nfl:'PHI', age:28, tier:3},
+  {id:118,name:'Courtland Sutton',  pos:'WR', nfl:'DEN', age:30, tier:3},
+  {id:119,name:'Zay Flowers',       pos:'WR', nfl:'BAL', age:24, tier:3},
+  {id:120,name:'Rashee Rice',       pos:'WR', nfl:'KC',  age:24, tier:3},
+  {id:121,name:'Mike Evans',        pos:'WR', nfl:'TB',  age:32, tier:3},
+  {id:122,name:'Drake London',      pos:'WR', nfl:'ATL', age:24, tier:3},
+  {id:123,name:'Tee Higgins',       pos:'WR', nfl:'CIN', age:26, tier:3},
+  {id:124,name:'George Pickens',    pos:'WR', nfl:'PIT', age:24, tier:3},
+  {id:125,name:'Tank Dell',         pos:'WR', nfl:'HOU', age:25, tier:3},
+  {id:126,name:'Deebo Samuel',      pos:'WR', nfl:'SF',  age:29, tier:3},
+  {id:127,name:'DJ Moore',          pos:'WR', nfl:'CHI', age:28, tier:3},
+  {id:128,name:'Wan\'Dale Robinson',pos:'WR', nfl:'NYG', age:24, tier:4},
+  {id:129,name:'Quentin Johnston',  pos:'WR', nfl:'LAC', age:23, tier:4},
+  {id:130,name:'Xavier Worthy',     pos:'WR', nfl:'KC',  age:22, tier:4},
+  {id:131,name:'Rome Odunze',       pos:'WR', nfl:'CHI', age:23, tier:4},
+  {id:132,name:'Ladd McConkey',     pos:'WR', nfl:'LAC', age:23, tier:4},
+  // TEs
+  {id:150,name:'Sam LaPorta',       pos:'TE', nfl:'DET', age:24, tier:1},
+  {id:151,name:'Trey McBride',      pos:'TE', nfl:'ARI', age:25, tier:1},
+  {id:152,name:'Brock Bowers',      pos:'TE', nfl:'LV',  age:22, tier:1},
+  {id:153,name:'Jake Ferguson',     pos:'TE', nfl:'DAL', age:25, tier:2},
+  {id:154,name:'Evan Engram',       pos:'TE', nfl:'JAX', age:30, tier:2},
+  {id:155,name:'Mark Andrews',      pos:'TE', nfl:'BAL', age:30, tier:2},
+  {id:156,name:'Kyle Pitts',        pos:'TE', nfl:'ATL', age:25, tier:2},
+  {id:157,name:'Dalton Kincaid',    pos:'TE', nfl:'BUF', age:25, tier:3},
+  {id:158,name:'Tucker Kraft',      pos:'TE', nfl:'GB',  age:24, tier:3},
+  {id:159,name:'Cade Otton',        pos:'TE', nfl:'TB',  age:25, tier:3},
+  {id:160,name:'Taysom Hill',       pos:'TE', nfl:'NO',  age:35, tier:4},
+  {id:161,name:'Chigoziem Okonkwo', pos:'TE', nfl:'TEN', age:25, tier:4},
+  {id:162,name:'Ja\'Tavion Thomas', pos:'TE', nfl:'CIN', age:23, tier:4},
+  // Kickers
+  {id:200,name:'Justin Tucker',     pos:'K',  nfl:'BAL', age:35, tier:1},
+  {id:201,name:'Harrison Butker',   pos:'K',  nfl:'KC',  age:29, tier:1},
+  {id:202,name:'Tyler Bass',        pos:'K',  nfl:'BUF', age:28, tier:2},
+  {id:203,name:'Younghoe Koo',      pos:'K',  nfl:'ATL', age:30, tier:2},
+  {id:204,name:'Jake Elliott',      pos:'K',  nfl:'PHI', age:30, tier:2},
+  {id:205,name:'Evan McPherson',    pos:'K',  nfl:'CIN', age:26, tier:2},
+  {id:206,name:'Brandon Aubrey',    pos:'K',  nfl:'DAL', age:30, tier:2},
+  // DEF
+  {id:250,name:'San Francisco 49ers',pos:'DEF',nfl:'SF', age:0,  tier:1},
+  {id:251,name:'Dallas Cowboys',    pos:'DEF',nfl:'DAL', age:0,  tier:1},
+  {id:252,name:'Baltimore Ravens',  pos:'DEF',nfl:'BAL', age:0,  tier:1},
+  {id:253,name:'New England Patriots',pos:'DEF',nfl:'NE',age:0,  tier:2},
+  {id:254,name:'Pittsburgh Steelers',pos:'DEF',nfl:'PIT',age:0,  tier:2},
+  {id:255,name:'Cleveland Browns',  pos:'DEF',nfl:'CLE', age:0,  tier:2},
+  {id:256,name:'Buffalo Bills',     pos:'DEF',nfl:'BUF', age:0,  tier:3},
+  {id:257,name:'Philadelphia Eagles',pos:'DEF',nfl:'PHI',age:0,  tier:3},
+];
+
+// ─────────────────────────────────────────────
+// STATE
+// ─────────────────────────────────────────────
+let state = {
+  config: null,
+  draftOrder: [],   // array of {round, pick, teamIndex} for every pick slot
+  picks: [],        // array of {pickNum, teamIndex, player}
+  currentPick: 0,   // index into draftOrder
+  started: false,
+  complete: false,
+};
+
+let timerInterval = null;
+let timerRemaining = 0;
+let timerPaused = false;
+let pendingPlayer = null;
+let posFilter = 'ALL';
+
+// ─────────────────────────────────────────────
+// SETUP
+// ─────────────────────────────────────────────
+function renderTeamInputs() {
+  const n = parseInt(document.getElementById('cfg-teams').value);
+  const grid = document.getElementById('teams-grid');
+  const myTeamSel = document.getElementById('cfg-my-team');
+
+  grid.innerHTML = '';
+  myTeamSel.innerHTML = '<option value="0">Spectator</option>';
+
+  for (let i = 1; i <= n; i++) {
+    const row = document.createElement('div');
+    row.className = 'team-input-row';
+    row.innerHTML = `<span class="team-num">${i}.</span>
+      <input type="text" id="team-name-${i}" value="Team ${i}" placeholder="Team ${i}" style="font-size:13px;padding:6px 10px;">`;
+    grid.appendChild(row);
+    myTeamSel.innerHTML += `<option value="${i}">Team ${i}</option>`;
+  }
+
+  // update order placeholder
+  const orderInput = document.getElementById('cfg-order');
+  orderInput.placeholder = Array.from({length: n}, (_,i) => i+1).join(',');
+}
+
+function loadSaved() {
+  const saved = localStorage.getItem('dynasty-draft-state');
+  if (!saved) { showToast('No saved draft found'); return; }
+  try {
+    state = JSON.parse(saved);
+    document.getElementById('setup-overlay').style.display = 'none';
+    document.getElementById('app').style.display = 'flex';
+    renderAll();
+    showToast('Draft loaded!');
+  } catch(e) {
+    showToast('Failed to load saved draft');
+  }
+}
+
+function startDraft() {
+  const n = parseInt(document.getElementById('cfg-teams').value);
+  const rounds = parseInt(document.getElementById('cfg-rounds').value);
+  const type = document.getElementById('cfg-type').value;
+  const timerSec = parseInt(document.getElementById('cfg-timer').value);
+  const myTeam = parseInt(document.getElementById('cfg-my-team').value);
+  const leagueName = document.getElementById('cfg-name').value || 'Dynasty League';
+
+  const teamNames = [];
+  for (let i = 1; i <= n; i++) {
+    teamNames.push(document.getElementById(`team-name-${i}`).value || `Team ${i}`);
+  }
+
+  // Parse draft order
+  const orderRaw = document.getElementById('cfg-order').value.trim();
+  let round1Order;
+  if (orderRaw) {
+    round1Order = orderRaw.split(',').map(s => parseInt(s.trim()) - 1).filter(x => !isNaN(x) && x >= 0 && x < n);
+    if (round1Order.length !== n) {
+      // fill missing
+      const present = new Set(round1Order);
+      for (let i = 0; i < n; i++) { if (!present.has(i)) round1Order.push(i); }
+    }
+  } else {
+    round1Order = Array.from({length: n}, (_, i) => i);
+  }
+
+  // Build full draft order
+  const draftOrder = [];
+  for (let r = 0; r < rounds; r++) {
+    let order;
+    if (type === 'snake') {
+      order = r % 2 === 0 ? [...round1Order] : [...round1Order].reverse();
+    } else if (type === '3rd-round-reversal') {
+      if (r < 2) order = [...round1Order];
+      else order = r % 2 === 0 ? [...round1Order].reverse() : [...round1Order];
+    } else {
+      order = [...round1Order];
+    }
+    order.forEach((teamIdx, pickInRound) => {
+      draftOrder.push({ round: r + 1, pickInRound: pickInRound + 1, teamIdx, pickNum: draftOrder.length + 1 });
+    });
+  }
+
+  state = {
+    config: { n, rounds, type, timerSec, myTeam, leagueName, teamNames },
+    draftOrder,
+    picks: [],
+    currentPick: 0,
+    started: true,
+    complete: false,
+  };
+
+  saveState();
+  document.getElementById('setup-overlay').style.display = 'none';
+  document.getElementById('app').style.display = 'flex';
+  renderAll();
+  startTimer();
+}
+
+// ─────────────────────────────────────────────
+// DRAFT LOGIC
+// ─────────────────────────────────────────────
+function draftPlayer(player) {
+  if (state.complete) return;
+  if (isDrafted(player.id)) return;
+  pendingPlayer = player;
+  const slot = state.draftOrder[state.currentPick];
+  const teamName = state.config.teamNames[slot.teamIdx];
+  document.getElementById('confirm-title').textContent = 'Confirm Pick';
+  document.getElementById('confirm-body').textContent =
+    `Draft ${player.name} (${player.pos}, ${player.nfl}) for ${teamName}?`;
+  document.getElementById('confirm-overlay').classList.add('show');
+}
+
+function confirmPick() {
+  if (!pendingPlayer) return;
+  closeConfirm();
+
+  const slot = state.draftOrder[state.currentPick];
+  state.picks.push({ pickNum: slot.pickNum, round: slot.round, pickInRound: slot.pickInRound, teamIdx: slot.teamIdx, player: pendingPlayer });
+  state.currentPick++;
+  pendingPlayer = null;
+
+  if (state.currentPick >= state.draftOrder.length) {
+    state.complete = true;
+    stopTimer();
+    document.getElementById('complete-banner').style.display = 'block';
+    setTimeout(() => document.getElementById('complete-banner').style.display = 'none', 4000);
+    document.getElementById('status-dot').className = 'status-dot done';
+    document.getElementById('status-text').textContent = 'Complete';
+  } else {
+    startTimer();
+  }
+
+  saveState();
+  renderAll();
+}
+
+function closeConfirm() {
+  document.getElementById('confirm-overlay').classList.remove('show');
+  pendingPlayer = null;
+}
+
+function undoPick() {
+  if (state.picks.length === 0) { showToast('Nothing to undo'); return; }
+  state.picks.pop();
+  state.currentPick = Math.max(0, state.currentPick - 1);
+  state.complete = false;
+  document.getElementById('complete-banner').style.display = 'none';
+  saveState();
+  startTimer();
+  renderAll();
+  showToast('Pick undone');
+}
+
+function isDrafted(playerId) {
+  return state.picks.some(p => p.player.id === playerId);
+}
+
+// ─────────────────────────────────────────────
+// TIMER
+// ─────────────────────────────────────────────
+function startTimer() {
+  if (!state.config || state.config.timerSec === 0 || state.complete) return;
+  stopTimer();
+  timerRemaining = state.config.timerSec;
+  timerPaused = false;
+  updateTimerDisplay();
+  const el = document.getElementById('timer-display');
+  el.style.display = 'block';
+  document.getElementById('btn-timer-toggle').style.display = 'inline-flex';
+
+  timerInterval = setInterval(() => {
+    if (timerPaused) return;
+    timerRemaining--;
+    updateTimerDisplay();
+    if (timerRemaining <= 0) { stopTimer(); showToast('⏰ Time is up!'); }
+  }, 1000);
+}
+
+function stopTimer() {
+  if (timerInterval) { clearInterval(timerInterval); timerInterval = null; }
+}
+
+function updateTimerDisplay() {
+  const el = document.getElementById('timer-display');
+  const mins = Math.floor(timerRemaining / 60);
+  const secs = timerRemaining % 60;
+  el.textContent = `${mins}:${secs.toString().padStart(2,'0')}`;
+  el.className = timerRemaining <= 10 ? 'danger' : timerRemaining <= 30 ? 'warning' : '';
+}
+
+function toggleTimer() {
+  timerPaused = !timerPaused;
+  const btn = document.getElementById('btn-timer-toggle');
+  btn.textContent = timerPaused ? '▶ Resume' : '⏸ Pause';
+  const dot = document.getElementById('status-dot');
+  dot.className = timerPaused ? 'status-dot paused' : 'status-dot';
+  document.getElementById('status-text').textContent = timerPaused ? 'Paused' : 'Live';
+}
+
+// ─────────────────────────────────────────────
+// RENDER
+// ─────────────────────────────────────────────
+function renderAll() {
+  renderHeader();
+  renderPlayerList();
+  renderBoard();
+  renderLog();
+}
+
+function renderHeader() {
+  const { config, draftOrder, currentPick, complete } = state;
+  if (!config) return;
+  document.getElementById('hdr-league').textContent = config.leagueName;
+
+  if (complete) {
+    document.getElementById('hdr-pick').textContent = 'Draft Complete';
+    document.getElementById('hdr-team').textContent = '—';
+    return;
+  }
+
+  const slot = draftOrder[currentPick];
+  const round = slot.round;
+  const pick = slot.pickInRound;
+  document.getElementById('hdr-pick').textContent = `Pick ${round}.${String(pick).padStart(2,'0')}`;
+  document.getElementById('hdr-team').textContent = config.teamNames[slot.teamIdx];
+
+  if (config.timerSec > 0) {
+    document.getElementById('timer-display').style.display = 'block';
+    document.getElementById('btn-timer-toggle').style.display = 'inline-flex';
+  }
+}
+
+function setFilter(pos) {
+  posFilter = pos;
+  document.querySelectorAll('.pos-btn').forEach(b => b.classList.toggle('active', b.dataset.pos === pos));
+  renderPlayerList();
+}
+
+function renderPlayerList() {
+  const search = (document.getElementById('player-search').value || '').toLowerCase();
+  const list = document.getElementById('player-list');
+
+  const filtered = PLAYERS.filter(p => {
+    if (posFilter !== 'ALL' && p.pos !== posFilter) return false;
+    if (search && !p.name.toLowerCase().includes(search) && !p.nfl.toLowerCase().includes(search)) return false;
+    return true;
+  });
+
+  const available = filtered.filter(p => !isDrafted(p.id));
+  const drafted = filtered.filter(p => isDrafted(p.id));
+  const combined = [...available, ...drafted];
+
+  list.innerHTML = combined.map(p => `
+    <div class="player-card ${isDrafted(p.id) ? 'drafted' : ''}" onclick="draftPlayer(PLAYERS.find(x=>x.id===${p.id}))">
+      <span class="pos-pill pos-${p.pos}">${p.pos}</span>
+      <div class="player-info">
+        <div class="player-name">${p.name}</div>
+        <div class="player-meta">${p.nfl}${p.age ? ' · Age ' + p.age : ''}</div>
+      </div>
+      <span class="tier-badge">T${p.tier}</span>
+    </div>
+  `).join('');
+
+  document.getElementById('pool-count').textContent =
+    `${available.length} available · ${PLAYERS.filter(p => isDrafted(p.id)).length} drafted`;
+}
+
+function renderBoard() {
+  const { config, draftOrder, picks, currentPick } = state;
+  if (!config) return;
+
+  const { n, rounds, teamNames } = config;
+  const board = document.getElementById('draft-board');
+
+  // Build picks lookup: pickNum -> pick
+  const pickByNum = {};
+  picks.forEach(p => { pickByNum[p.pickNum] = p; });
+
+  // Grid: (rounds+1) rows × (n+1) cols
+  board.style.gridTemplateColumns = `60px repeat(${n}, minmax(110px, 1fr))`;
+
+  let html = '';
+
+  // Header row
+  html += '<div></div>'; // corner
+  for (let t = 0; t < n; t++) {
+    html += `<div class="board-th">${teamNames[t]}</div>`;
+  }
+
+  // Data rows
+  for (let r = 0; r < rounds; r++) {
+    html += `<div class="board-round-num">R${r+1}</div>`;
+
+    for (let col = 0; col < n; col++) {
+      // Find the pick slot for this round/col
+      const slotIdx = r * n + col;
+      const slot = draftOrder[slotIdx];
+      if (!slot) { html += '<div class="board-cell"></div>'; continue; }
+
+      const pick = pickByNum[slot.pickNum];
+      const isOnClock = slotIdx === currentPick && !state.complete;
+
+      if (pick) {
+        const posClass = `pos-${pick.player.pos}`;
+        html += `<div class="board-cell filled">
+          <div class="cell-pick">${slot.round}.${String(slot.pickInRound).padStart(2,'0')}</div>
+          <div class="cell-player ${posClass}" style="font-size:12px;font-weight:700;">${pick.player.name}</div>
+          <div style="display:flex;gap:4px;">
+            <span class="cell-pos ${posClass}">${pick.player.pos}</span>
+            <span class="cell-team">${pick.player.nfl}</span>
+          </div>
+        </div>`;
+      } else {
+        html += `<div class="board-cell ${isOnClock ? 'on-clock-cell' : ''}">
+          <div class="cell-pick" style="font-size:10px;color:var(--text3);">${slot.round}.${String(slot.pickInRound).padStart(2,'0')}</div>
+          ${isOnClock ? '<div style="font-size:11px;color:var(--accent);font-weight:600;">On the Clock</div>' : ''}
+        </div>`;
+      }
+    }
+  }
+
+  board.innerHTML = html;
+
+  // Scroll to current pick row
+  if (!state.complete && currentPick < draftOrder.length) {
+    const currentRound = draftOrder[currentPick].round;
+    setTimeout(() => {
+      const cells = board.querySelectorAll('.board-cell');
+      const onClockCell = board.querySelector('.on-clock-cell');
+      if (onClockCell) {
+        onClockCell.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+      }
+    }, 50);
+  }
+}
+
+function renderLog() {
+  const { picks } = state;
+  const logList = document.getElementById('log-list');
+  document.getElementById('log-count').textContent = `${picks.length} pick${picks.length !== 1 ? 's' : ''}`;
+
+  if (picks.length === 0) {
+    logList.innerHTML = '<div style="padding:12px;color:var(--text3);font-size:12px;text-align:center;">No picks yet</div>';
+    return;
+  }
+
+  logList.innerHTML = [...picks].reverse().map((p, i) => `
+    <div class="log-item ${i === 0 ? 'latest' : ''}">
+      <div class="log-pick">Pick ${p.round}.${String(p.pickInRound).padStart(2,'0')} · Overall #${p.pickNum}</div>
+      <div class="log-player pos-${p.player.pos}" style="font-weight:700;">${p.player.name}</div>
+      <div class="log-team">${state.config.teamNames[p.teamIdx]} · ${p.player.pos} · ${p.player.nfl}</div>
+    </div>
+  `).join('');
+}
+
+// ─────────────────────────────────────────────
+// PERSISTENCE
+// ─────────────────────────────────────────────
+function saveState() {
+  localStorage.setItem('dynasty-draft-state', JSON.stringify(state));
+}
+
+// ─────────────────────────────────────────────
+// EXPORT
+// ─────────────────────────────────────────────
+function exportDraft() {
+  if (!state.config) return;
+  const { teamNames } = state.config;
+
+  let csv = 'Pick,Round,Pick In Round,Team,Player,Position,NFL Team,Age,Tier\n';
+  state.picks.forEach(p => {
+    csv += `${p.pickNum},${p.round},${p.pickInRound},"${teamNames[p.teamIdx]}","${p.player.name}",${p.player.pos},${p.player.nfl},${p.player.age},${p.player.tier}\n`;
+  });
+
+  const blob = new Blob([csv], { type: 'text/csv' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = `dynasty-draft-${new Date().toISOString().slice(0,10)}.csv`;
+  a.click();
+  URL.revokeObjectURL(url);
+  showToast('Draft exported!');
+}
+
+// ─────────────────────────────────────────────
+// RESET
+// ─────────────────────────────────────────────
+function resetDraft() {
+  if (!confirm('Reset and return to setup? Current draft will be saved.')) return;
+  stopTimer();
+  document.getElementById('app').style.display = 'none';
+  document.getElementById('setup-overlay').style.display = 'flex';
+  renderTeamInputs();
+}
+
+// ─────────────────────────────────────────────
+// TOAST
+// ─────────────────────────────────────────────
+function showToast(msg) {
+  const el = document.getElementById('toast');
+  el.textContent = msg;
+  el.classList.add('show');
+  setTimeout(() => el.classList.remove('show'), 2500);
+}
+
+// ─────────────────────────────────────────────
+// INIT
+// ─────────────────────────────────────────────
+renderTeamInputs();
+
+// Keyboard shortcuts
+document.addEventListener('keydown', e => {
+  if (e.key === 'Escape') closeConfirm();
+  if (e.key === 'Enter' && document.getElementById('confirm-overlay').classList.contains('show')) confirmPick();
+});
+</script>
+</body>
+</html>
