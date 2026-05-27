@@ -232,10 +232,6 @@ input[type=range]:disabled{opacity:.4;}
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 11l19-9-9 19-2-8-8-2z"/></svg>
       <span style="font-size:9px">Meals</span>
     </div>
-    <div class="nav-item" id="nav-wine" onclick="App.setView('wine')">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M8 22h8M12 22v-7M5 3h14l-3 7a4 4 0 01-8 0L5 3z"/></svg>
-      <span style="font-size:9px">Wine</span>
-    </div>
     <div class="nav-item" id="nav-rankings" onclick="App.setView('rankings')">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
       <span style="font-size:9px">Best Of</span>
@@ -339,11 +335,12 @@ function mealFoodAvg(meal) {
   return rs.length ? Math.round(rs.reduce((a,b)=>a+b,0)/rs.length) : null;
 }
 function mealAvgRating(meal) {
-  // Weighted aggregate: food scores (weight 2) + each venue dimension (weight 1)
+  // Weighted: food avg (×2) + venue dims (×1 each) + shared apps rating (×1)
   const scores = [];
   const food = mealFoodAvg(meal);
   if (food !== null) scores.push({ v: food, w: 2 });
   MEAL_DIMS.forEach(d => { if (typeof meal[d.key] === 'number') scores.push({ v: meal[d.key], w: 1 }); });
+  if (typeof meal.sharedRating === 'number') scores.push({ v: meal.sharedRating, w: 1 });
   if (!scores.length) return null;
   const tw = scores.reduce((s,x)=>s+x.w, 0);
   return Math.round(scores.reduce((s,x)=>s+x.v*x.w, 0) / tw);
@@ -390,11 +387,6 @@ function getPersonStats() {
   });
   return stats;
 }
-function getWineStats() {
-  const total=state.wines.reduce((s,w)=>s+(parseFloat(w.pricePerBottle)||0),0);
-  return {total,count:state.wines.length};
-}
-
 // ── PER-PERSON SCORE UI ───────────────────────────────────────────────────────
 function personScoreHTML(t) {
   const r = window._mealForm?.orders?.[t]?.rating;
@@ -444,6 +436,20 @@ function dimScoreHTML(key) {
     <button onclick="App.clearDimRating('${key}')" style="background:none;border:none;color:var(--text3);cursor:pointer;font-size:15px;padding:2px;line-height:1">✕</button>`;
 }
 
+function sharedRatingScoreHTML() {
+  const r = window._mealForm?.sharedRating;
+  if (r === null || r === undefined) {
+    return `<button onclick="App.activateSharedRating()" class="btn btn-sm" style="background:var(--primary);color:#fff;padding:4px 9px;font-size:11px;border-radius:7px">Rate</button>
+      <span style="font-size:11px;color:var(--text3)">optional</span>`;
+  }
+  const c = scoreColor(r);
+  return `<input type="range" min="0" max="100" value="${r}"
+      oninput="App.updateSharedRating(this.value)"
+      style="flex:1;accent-color:var(--primary);">
+    <span id="dsv-shared" style="font-family:'Outfit',sans-serif;font-weight:800;font-size:15px;color:${c};min-width:22px;text-align:right">${r}</span>
+    <button onclick="App.clearSharedRating()" style="background:none;border:none;color:var(--text3);cursor:pointer;font-size:15px;padding:2px;line-height:1">✕</button>`;
+}
+
 // ── SHARED TABLE ITEMS ────────────────────────────────────────────────────────
 function sharedItemsHTML() {
   const items = window._mealForm?.sharedItems || [];
@@ -464,8 +470,6 @@ const Views = {
     const today = DAYS[ti];
     const tripDone = todayStr() > '2026-05-29';
     const totalMeals = state.meals.length;
-    const totalWines = state.wines.length;
-    const ws = getWineStats();
     const totalActs = DAYS.reduce((s,d)=>s+(state.dayData[d.date]?.activities?.length||0),0);
 
     let heroContent;
@@ -525,7 +529,7 @@ const Views = {
         <div class="progress-bar"><div class="progress-fill" style="width:${pct}%"></div></div>
       </div>
       <div class="stat-grid-4">
-        ${[['🍽',totalMeals,'Meals'],['🍷',totalWines,'Wines'],['🎯',totalActs,'Activities'],['💰',ws.total>0?'$'+Math.round(ws.total):'—','Wine $']].map(([ic,v,l])=>`
+        ${[['🍽',totalMeals,'Meals'],['🎯',totalActs,'Activities'],['👨‍👩‍👧‍👦',TRAVELERS.length,'Travelers'],['📅',9,'Days']].map(([ic,v,l])=>`
         <div class="stat-card"><div style="font-size:20px;margin-bottom:3px">${ic}</div><div class="stat-num">${v}</div><div class="stat-label">${l}</div></div>`).join('')}
       </div>
       ${topRestHtml}
@@ -541,7 +545,6 @@ const Views = {
         </div>${todayActsHtml}</div>`:''}
       <div style="display:flex;gap:8px;padding-bottom:10px;flex-wrap:wrap">
         <button class="btn btn-primary" onclick="App.openAddMeal()" style="flex:1;min-width:100px">🍽 Add Meal</button>
-        <button class="btn btn-wine" onclick="App.openAddWine()" style="flex:1;min-width:100px">🍷 Add Wine</button>
         <button class="btn btn-orange" onclick="App.setView('rankings')" style="flex:1;min-width:100px">🏆 Best Of</button>
       </div></div>`;
   },
@@ -680,8 +683,9 @@ const Views = {
             </div>
             <div style="font-size:12px;color:var(--text3)">${ordCt}/${TRAVELERS.length} orders logged</div>
           </div>
-          <div style="text-align:right;flex-shrink:0">
+          <div style="text-align:right;flex-shrink:0;display:flex;flex-direction:column;align-items:flex-end;gap:6px">
             ${avg!==null?`<div style="font-family:'Outfit',sans-serif;font-size:28px;font-weight:800;color:${scoreColor(avg)};line-height:1">${avg}</div><div style="font-size:11px;color:var(--text3)">/100 avg</div>`:'<div style="font-size:12px;color:var(--text3)">No scores</div>'}
+            <button onclick="event.stopPropagation();App.editMeal('${m.id}')" class="btn btn-sm btn-secondary" style="font-size:11px;padding:4px 10px">✏️ Edit</button>
           </div>
         </div></div>`;
     });
@@ -736,7 +740,7 @@ const Views = {
           ${avg!==null?`<div style="text-align:right;flex-shrink:0">
             <div style="font-family:'Outfit',sans-serif;font-size:40px;font-weight:800;color:${scoreColor(avg)};line-height:1">${avg}</div>
             <div style="font-size:11px;color:var(--text3);margin-bottom:6px">overall / 100</div>
-            ${[{k:'food',l:'Food',v:mealFoodAvg(meal)},...MEAL_DIMS.map(d=>({k:d.key,l:d.label,v:meal[d.key]??null}))].filter(x=>x.v!==null).map(x=>`
+            ${[{k:'food',l:'Food',v:mealFoodAvg(meal)},...MEAL_DIMS.map(d=>({k:d.key,l:d.label,v:meal[d.key]??null})),{k:'shared',l:'Shared',v:meal.sharedRating??null}].filter(x=>x.v!==null).map(x=>`
               <div style="font-size:11px;color:${scoreColor(x.v)};font-weight:600;text-align:right">${x.l}: ${x.v}</div>`).join('')}
           </div>`:''}
         </div></div>
@@ -744,12 +748,15 @@ const Views = {
         <div class="section-label">Menu Photo</div>
         <img src="${meal.menuPhoto}" class="photo-preview" onclick="App.viewPhoto('${meal.id}')" style="cursor:pointer">
         <div style="font-size:11px;color:var(--text3);margin-top:5px;text-align:center">Tap to enlarge</div></div>`:''}
-      ${meal.sharedItems?.length ? `<div class="card" style="margin-bottom:10px;background:rgba(194,112,14,.04)">
-        <div class="section-label">🍽 Shared for the Table</div>
-        ${meal.sharedItems.map(item=>`<div style="display:flex;align-items:center;gap:10px;padding:7px 0;border-bottom:1px solid var(--border2)">
+      ${(meal.sharedItems?.length || typeof meal.sharedRating === 'number') ? `<div class="card" style="margin-bottom:10px;background:rgba(194,112,14,.04)">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
+          <div class="section-label" style="margin-bottom:0">🍽 Shared for the Table</div>
+          ${typeof meal.sharedRating === 'number' ? `<div style="display:flex;align-items:baseline;gap:2px"><span style="font-family:'Outfit',sans-serif;font-size:18px;font-weight:800;color:${scoreColor(meal.sharedRating)}">${meal.sharedRating}</span><span style="font-size:11px;color:var(--text3)">/100 group</span></div>` : ''}
+        </div>
+        ${meal.sharedItems?.map(item=>`<div style="display:flex;align-items:center;gap:10px;padding:7px 0;border-bottom:1px solid var(--border2)">
           <span style="font-size:18px">🫱</span>
           <span style="font-size:15px;font-weight:500">${item.name}</span>
-        </div>`).join('')}
+        </div>`).join('')||''}
       </div>` : ''}
       <div class="card" style="margin-bottom:10px">
         <div class="section-label">Orders — Adults</div>${makeRows(ADULTS)}</div>
@@ -759,46 +766,6 @@ const Views = {
         <div class="section-label">Notes</div>
         <div style="font-size:14px;color:var(--text2);line-height:1.7">${meal.overallNotes}</div></div>`:''}
     </div>`;
-  },
-
-  wine() {
-    const ws = getWineStats();
-    document.getElementById('mainHeader').innerHTML = `
-      <div class="header-logo"><div class="header-icon">🌵</div>
-        <div><div class="header-title">Wine Log</div><div class="header-sub">${ws.count} bottle${ws.count!==1?'s':''}</div></div>
-      </div>
-      <div class="header-actions"><button class="btn btn-sm btn-wine" onclick="App.openAddWine()">+ Wine</button></div>`;
-
-    if (!state.wines.length) return `<div class="empty" style="margin-top:40px"><div class="empty-icon">🍷</div><h3>No wines yet</h3><p>Log your first Cabo wine</p></div>`;
-
-    const sorted = [...state.wines].sort((a,b)=>a.date<b.date?1:-1);
-    let html = `<div style="background:linear-gradient(135deg,var(--wine),var(--wine2));border-radius:16px;padding:18px;margin:16px 16px 10px;color:#fffdf9">
-      <div style="font-size:13px;opacity:.75;margin-bottom:4px">Total Wine Spend</div>
-      <div style="font-family:'Outfit',sans-serif;font-size:36px;font-weight:800;line-height:1">${formatPrice(ws.total)}</div>
-      <div style="font-size:12px;opacity:.7;margin-top:4px">${ws.count} bottle${ws.count!==1?'s':''} · avg ${ws.count>0?formatPrice(ws.total/ws.count):'—'} each</div>
-    </div><div style="padding:0 16px">`;
-
-    sorted.forEach(w=>{
-      const dayInfo = DAYS.find(d=>d.date===w.date);
-      html += `<div class="wine-card" onclick="App.editWine('${w.id}')">
-        <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:10px">
-          <div style="flex:1">
-            <div style="font-family:'Outfit',sans-serif;font-size:17px;font-weight:700;color:var(--wine);margin-bottom:3px">🍷 ${w.name||'Unnamed'}</div>
-            <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:4px">
-              ${w.varietal?`<span class="badge badge-wine">${w.varietal}</span>`:''}
-              ${w.vintage?`<span class="badge" style="background:rgba(124,29,29,.08);color:var(--wine2)">${w.vintage}</span>`:''}
-              ${dayInfo?`<span class="badge badge-muted">${dayInfo.short}</span>`:''}
-            </div>
-            ${w.restaurant?`<div style="font-size:12px;color:var(--text3)">📍 ${w.restaurant}</div>`:''}
-            ${w.notes?`<div style="font-size:12px;color:var(--text3);font-style:italic;margin-top:3px">${w.notes}</div>`:''}
-          </div>
-          <div style="text-align:right;flex-shrink:0">
-            <div style="font-family:'Outfit',sans-serif;font-size:22px;font-weight:800;color:var(--wine)">${formatPrice(w.pricePerBottle)}</div>
-            <div style="font-size:11px;color:var(--text3)">/bottle</div>
-          </div>
-        </div></div>`;
-    });
-    return html + '</div>';
   },
 
   rankings() {
@@ -811,7 +778,6 @@ const Views = {
     const bestRests = getBestRestaurants();
     const bestDishes = getBestDishes().slice(0,10);
     const pStats = getPersonStats();
-    const ws = getWineStats();
     const medals = ['🥇','🥈','🥉'];
 
     const restsHtml = bestRests.length ? bestRests.slice(0,8).map((r,i)=>`
@@ -857,18 +823,7 @@ const Views = {
         </div></div>`;
     }).join('') : `<div style="text-align:center;padding:20px;color:var(--text3);font-size:13px">Score meals to build the leaderboard</div>`;
 
-    const sortedWines = [...state.wines].sort((a,b)=>(parseFloat(b.pricePerBottle)||0)-(parseFloat(a.pricePerBottle)||0));
-    const wineHtml = sortedWines.length ? sortedWines.slice(0,5).map((w,i)=>`
-      <div class="rank-item">
-        ${i<3?`<div class="rank-medal">${medals[i]}</div>`:`<div class="rank-num">${i+1}</div>`}
-        <div style="flex:1">
-          <div style="font-weight:600;font-size:14px">${w.name||'Unnamed'}${w.vintage?' ('+w.vintage+')':''}</div>
-          <div style="font-size:12px;color:var(--text3)">${w.varietal||''}${w.varietal&&w.restaurant?' · ':''}${w.restaurant||''}</div>
-        </div>
-        <div style="font-family:'Outfit',sans-serif;font-size:18px;font-weight:800;color:var(--wine)">${formatPrice(w.pricePerBottle)}</div>
-      </div>`).join('') : `<div style="text-align:center;padding:20px;color:var(--text3);font-size:13px">No wines logged yet</div>`;
-
-    return `<div class="page-header"><div class="page-title">🏆 Best Of Cabo</div><div class="page-sub">${state.meals.length} meals · ${state.wines.length} wines</div></div>
+    return `<div class="page-header"><div class="page-title">🏆 Best Of Cabo</div><div class="page-sub">${state.meals.length} meals logged</div></div>
     <div style="padding:0 16px">
       <div class="card" style="margin-bottom:10px">
         <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
@@ -883,11 +838,6 @@ const Views = {
       <div class="card" style="margin-bottom:10px">
         <div class="section-label" style="margin-bottom:12px">😋 Traveler Scoreboard</div>
         ${travHtml}</div>
-      <div class="card" style="margin-bottom:10px">
-        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
-          <div class="section-label" style="margin-bottom:0">🍷 Top Wines</div>
-          ${ws.count>0?`<span style="font-size:13px;font-weight:700;color:var(--wine)">${formatPrice(ws.total)} total</span>`:''}
-        </div>${wineHtml}</div>
       <button class="btn btn-primary btn-full" onclick="App.showReport()" style="margin-bottom:16px;padding:14px">📄 Export Full Trip Report</button>
     </div>`;
   }
@@ -930,6 +880,7 @@ function buildMealSheet(prefill = {}) {
     ambiance: prefill.ambiance ?? null,
     service:  prefill.service  ?? null,
     value:    prefill.value    ?? null,
+    sharedRating: prefill.sharedRating ?? null,
     sharedItems: prefill.sharedItems ? JSON.parse(JSON.stringify(prefill.sharedItems)) : [],
     orders: {}
   };
@@ -1006,6 +957,13 @@ function renderMealSheetHTML() {
     <div style="background:var(--bg);border-radius:12px;padding:10px 12px;margin-bottom:14px">
       <div id="shared-items-list">${sharedItemsHTML()}</div>
       <button class="btn btn-sm btn-secondary" onclick="App.addSharedItem()" style="width:100%;margin-top:4px">+ Add App / Salad / Shared Dish</button>
+      <div style="display:flex;align-items:center;gap:10px;padding:10px 0 2px;border-top:1px solid var(--border2);margin-top:10px">
+        <div style="min-width:76px">
+          <div style="font-size:13px;font-weight:600;color:var(--text2)">🫱 Group Rating</div>
+          <div style="font-size:10px;color:var(--text3)">Overall shared dishes score</div>
+        </div>
+        <div id="shared-rating-wrap" style="flex:1;display:flex;align-items:center;gap:8px">${sharedRatingScoreHTML()}</div>
+      </div>
     </div>
 
     <div class="section-label">Individual Orders &amp; Scores</div>
@@ -1023,35 +981,6 @@ function renderMealSheetHTML() {
     <div style="display:flex;gap:10px;margin-top:6px;padding-bottom:6px">
       <button class="btn btn-secondary" onclick="closeSheet()" style="flex:1">Cancel</button>
       <button class="btn btn-primary" onclick="App.saveMeal()" style="flex:2">💾 Save Meal</button>
-    </div>`;
-}
-
-// ── WINE SHEET ────────────────────────────────────────────────────────────────
-function buildWineSheet(prefill = {}) {
-  const ti = todayDayIndex();
-  const dateVal = prefill.date || DAYS[ti>=0?ti:0]?.date || DAYS[0].date;
-  window._wineForm = {
-    id: prefill.id||null, date: prefill.date||dateVal,
-    name: prefill.name||'', varietal: prefill.varietal||'', vintage: prefill.vintage||'',
-    restaurant: prefill.restaurant||'', pricePerBottle: prefill.pricePerBottle||'', notes: prefill.notes||''
-  };
-  const dayOpts = DAYS.map(d=>`<option value="${d.date}"${window._wineForm.date===d.date?' selected':''}>${d.long}</option>`).join('');
-  return `
-    <div class="field"><label>Day</label><select class="input" onchange="window._wineForm.date=this.value">${dayOpts}</select></div>
-    <div class="field"><label>Wine Name *</label><input class="input" id="wf-name" value="${window._wineForm.name}" placeholder="e.g. Marques de Casa Concha" oninput="window._wineForm.name=this.value"></div>
-    <div class="input-row">
-      <div class="field"><label>Varietal</label><input class="input" id="wf-var" value="${window._wineForm.varietal}" placeholder="e.g. Cabernet Sauvignon" oninput="window._wineForm.varietal=this.value"></div>
-      <div class="field"><label>Vintage</label><input class="input" id="wf-vin" type="number" value="${window._wineForm.vintage}" placeholder="e.g. 2021" min="1900" max="2030" oninput="window._wineForm.vintage=this.value"></div>
-    </div>
-    <div class="input-row">
-      <div class="field"><label>Price / Bottle ($)</label><input class="input" id="wf-price" type="number" value="${window._wineForm.pricePerBottle}" placeholder="0.00" oninput="window._wineForm.pricePerBottle=this.value"></div>
-      <div class="field"><label>Restaurant / Venue</label><input class="input" id="wf-rest" value="${window._wineForm.restaurant}" placeholder="Where ordered" oninput="window._wineForm.restaurant=this.value"></div>
-    </div>
-    <div class="field"><label>Notes</label><textarea class="input" id="wf-notes" rows="2" placeholder="Tasting notes, food pairing…" oninput="window._wineForm.notes=this.value">${window._wineForm.notes}</textarea></div>
-    ${window._wineForm.id ? `<button class="btn btn-danger btn-full" onclick="App.deleteWine('${window._wineForm.id}')" style="margin-bottom:8px">🗑 Delete Wine</button>` : ''}
-    <div style="display:flex;gap:10px;margin-top:2px;padding-bottom:6px">
-      <button class="btn btn-secondary" onclick="closeSheet()" style="flex:1">Cancel</button>
-      <button class="btn btn-wine" onclick="App.saveWine()" style="flex:2">🍷 Save Wine</button>
     </div>`;
 }
 
@@ -1079,8 +1008,7 @@ function buildActivitySheet(date, prefill = {}) {
 
 // ── REPORT ────────────────────────────────────────────────────────────────────
 function buildReport() {
-  const meals = state.meals, wines = state.wines;
-  const ws = getWineStats();
+  const meals = state.meals;
   const bestRests = getBestRestaurants();
   const bestDishes = getBestDishes().slice(0,10);
   const pStats = getPersonStats();
@@ -1150,20 +1078,10 @@ function buildReport() {
       </div>
       ${m.mustReturn?'<div style="display:inline-block;background:rgba(194,112,14,.1);color:#c2700e;border:1px solid rgba(194,112,14,.3);border-radius:12px;padding:2px 10px;font-size:11px;font-weight:700;margin-bottom:6px">⭐ Must Return!</div>':''}
       ${[{l:'🎭 Ambiance',v:m.ambiance},{l:'🤝 Service',v:m.service},{l:'💰 Value',v:m.value}].filter(x=>x.v!==null&&x.v!==undefined).length?`<div style="display:flex;gap:10px;margin-bottom:6px;flex-wrap:wrap">${[{l:'🎭 Ambiance',v:m.ambiance},{l:'🤝 Service',v:m.service},{l:'💰 Value',v:m.value}].filter(x=>typeof x.v==='number').map(x=>`<span style="font-size:12px;color:#64748b">${x.l}: <strong style="color:${x.v>=85?'#5d7a28':x.v>=70?'#c2700e':'#c4950a'}">${x.v}/100</strong></span>`).join('')}</div>`:''}
-      ${m.sharedItems?.length?`<div style="font-size:12px;color:#6b3a1f;margin-bottom:6px">🫱 Shared: <strong>${m.sharedItems.map(i=>i.name).join(', ')}</strong></div>`:''}
+      ${m.sharedItems?.length?`<div style="font-size:12px;color:#6b3a1f;margin-bottom:6px">🫱 Shared: <strong>${m.sharedItems.map(i=>i.name).join(', ')}</strong>${typeof m.sharedRating==='number'?` <span style="font-weight:700;color:${m.sharedRating>=85?'#5d7a28':m.sharedRating>=70?'#c2700e':'#c4950a'}">(${m.sharedRating}/100)</span>`:''}</div>`:''}
       ${orders?`<div style="background:#f8fafc;border-radius:8px;padding:8px 10px">${orders}</div>`:''}
       ${m.overallNotes?`<div style="font-size:12px;color:#94a3b8;font-style:italic;margin-top:6px">${m.overallNotes}</div>`:''}
       ${m.totalBill?`<div style="font-size:12px;color:#64748b;margin-top:4px">Bill: $${m.totalBill}</div>`:''}
-    </div>`;
-  }).join('');
-
-  const wineRows = [...wines].sort((a,b)=>a.date<b.date?-1:1).map(w=>{
-    const dayInfo=DAYS.find(d=>d.date===w.date);
-    return `<div style="display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid #f1f5f9">
-      <div><div style="font-weight:600;font-size:14px">🍷 ${w.name||'Unnamed'}${w.vintage?' ('+w.vintage+')':''}</div>
-      <div style="font-size:12px;color:#64748b">${w.varietal||''}${w.varietal&&w.restaurant?' · ':''}${w.restaurant||''}${dayInfo?' · '+dayInfo.short:''}</div>
-      ${w.notes?`<div style="font-size:12px;color:#94a3b8;font-style:italic">${w.notes}</div>`:''}</div>
-      <div style="font-family:'Outfit',sans-serif;font-size:18px;font-weight:800;color:#7c1d1d">${formatPrice(w.pricePerBottle)}</div>
     </div>`;
   }).join('');
 
@@ -1211,13 +1129,12 @@ body{font-family:'DM Sans',sans-serif;background:#faf5ee;color:#3c1a00;-webkit-p
   <p style="margin-top:4px">Robert, Nicole, Jodie, Marcos, Kristen, Quinn, Larry + Riley &amp; Morgan</p>
 </div>
 <div class="stat-row">
-  ${[['🍽',meals.length,'Meals'],['🍷',wines.length,'Wines'],['🎯',totalActs,'Activities'],['💰',formatPrice(ws.total),'Wine Spend']].map(([ic,v,l])=>`<div class="stat-box"><div style="font-size:20px;margin-bottom:4px">${ic}</div><div class="num">${v}</div><div class="lbl">${l}</div></div>`).join('')}
+  ${[['🍽',meals.length,'Meals'],['🎯',totalActs,'Activities'],['👨‍👩‍👧‍👦',TRAVELERS.length,'Travelers'],['📅',9,'Days']].map(([ic,v,l])=>`<div class="stat-box"><div style="font-size:20px;margin-bottom:4px">${ic}</div><div class="num">${v}</div><div class="lbl">${l}</div></div>`).join('')}
 </div>
 ${bestRests.length?`<div class="section"><h3>🏆 Best Restaurants</h3>${restRows}</div>`:''}
 ${bestDishes.length?`<div class="section"><h3>⭐ Best Dishes (Top ${bestDishes.length})</h3>${dishRows}</div>`:''}
 ${DAYS.some(d=>{const dd=state.dayData[d.date];return dd?.mood||mealsForDate(d.date).length||dd?.activities?.length;})?`<div class="section"><h3>📅 Day by Day</h3>${dayRows}</div>`:''}
 ${meals.length?`<div class="section"><h3>🍽 Complete Meal Log</h3>${mealRows}</div>`:''}
-${wines.length?`<div class="section"><h3>🍷 Wine Log · Total: ${formatPrice(ws.total)}</h3>${wineRows}</div>`:''}
 ${travStats?`<div class="section"><h3>😋 Traveler Scoreboard</h3>${travStats}</div>`:''}
 <div class="footer">Cabo 2026 Trip Report · Generated ${new Date().toLocaleDateString('en-US',{month:'long',day:'numeric',year:'numeric'})}</div>
 </div></body></html>`;
@@ -1229,7 +1146,7 @@ const App = {
     state.view = v;
     const navMap = {'day-detail':'days','meal-detail':'meals'};
     const act = navMap[v]||v;
-    ['dashboard','days','meals','wine','rankings'].forEach(id=>{
+    ['dashboard','days','meals','rankings'].forEach(id=>{
       const el=document.getElementById('nav-'+id);
       if (el) el.className='nav-item'+(act===id?' active':'');
     });
@@ -1270,6 +1187,23 @@ const App = {
     window._actForm.rating = null;
     const el = document.getElementById('act-score-wrap');
     if (el) el.innerHTML = actScoreHTML();
+  },
+
+  // Shared apps group rating
+  activateSharedRating() {
+    window._mealForm.sharedRating = 75;
+    const el = document.getElementById('shared-rating-wrap');
+    if (el) el.innerHTML = sharedRatingScoreHTML();
+  },
+  updateSharedRating(val) {
+    window._mealForm.sharedRating = parseInt(val);
+    const el = document.getElementById('dsv-shared');
+    if (el) { const r=parseInt(val); el.textContent=r; el.style.color=scoreColor(r); }
+  },
+  clearSharedRating() {
+    window._mealForm.sharedRating = null;
+    const el = document.getElementById('shared-rating-wrap');
+    if (el) el.innerHTML = sharedRatingScoreHTML();
   },
 
   // Venue dimension ratings
@@ -1383,7 +1317,7 @@ const App = {
     const notesInp=document.getElementById('ms-notes'); if(notesInp) f.overallNotes=notesInp.value;
     const billInp=document.getElementById('ms-bill'); if(billInp) f.totalBill=billInp.value;
     if (!f.restaurant && !TRAVELERS.some(t=>f.orders[t]?.dish)) { toast('Add a restaurant or at least one order'); return; }
-    const meal={id:f.id||uid(),date:f.date,restaurant:f.restaurant,cuisine:f.cuisine,mealType:f.mealType,overallNotes:f.overallNotes,totalBill:f.totalBill,mustReturn:f.mustReturn,menuPhoto:f.menuPhoto,ambiance:f.ambiance,service:f.service,value:f.value,sharedItems:f.sharedItems.filter(i=>i.name?.trim()),orders:f.orders};
+    const meal={id:f.id||uid(),date:f.date,restaurant:f.restaurant,cuisine:f.cuisine,mealType:f.mealType,overallNotes:f.overallNotes,totalBill:f.totalBill,mustReturn:f.mustReturn,menuPhoto:f.menuPhoto,ambiance:f.ambiance,service:f.service,value:f.value,sharedRating:f.sharedRating,sharedItems:f.sharedItems.filter(i=>i.name?.trim()),orders:f.orders};
     if (f.id) { state.meals=state.meals.map(m=>m.id===f.id?meal:m); toast('Meal updated'); }
     else { state.meals.push(meal); toast('Meal saved! 🍽'); }
     persist(); closeSheet(); this.render();
@@ -1399,32 +1333,6 @@ const App = {
     o.innerHTML=`<img src="${meal.menuPhoto}"><div style="position:absolute;top:16px;right:16px;background:rgba(0,0,0,.6);color:#fff;border:none;border-radius:50%;width:36px;height:36px;display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:18px" onclick="this.parentElement.remove()">✕</div>`;
     o.onclick=e=>{ if(e.target===o||e.target.tagName==='IMG') o.remove(); };
     document.body.appendChild(o);
-  },
-
-  // WINE
-  openAddWine()  { openSheet('Log a Wine', buildWineSheet()); },
-  editWine(id) {
-    const w=state.wines.find(w=>w.id===id); if(!w) return;
-    openSheet('Edit Wine', buildWineSheet(w));
-  },
-  saveWine() {
-    const f=window._wineForm;
-    ['wf-name','wf-var','wf-vin','wf-price','wf-rest','wf-notes'].forEach(id=>{
-      const el=document.getElementById(id); if(!el) return;
-      const key={['wf-name']:'name',['wf-var']:'varietal',['wf-vin']:'vintage',['wf-price']:'pricePerBottle',['wf-rest']:'restaurant',['wf-notes']:'notes'}[id];
-      if(key) f[key]=el.value.trim()||el.value;
-    });
-    if (!f.name) { toast('Enter a wine name'); return; }
-    const wine={id:f.id||uid(),date:f.date,name:f.name,varietal:f.varietal,vintage:f.vintage,restaurant:f.restaurant,pricePerBottle:f.pricePerBottle,notes:f.notes};
-    if (f.id) { state.wines=state.wines.map(w=>w.id===f.id?wine:w); toast('Wine updated'); }
-    else { state.wines.push(wine); toast('Wine logged! 🍷'); }
-    persist(); closeSheet(); this.render();
-  },
-
-  deleteWine(id) {
-    if (!confirm('Delete this wine?')) return;
-    state.wines = state.wines.filter(w => w.id !== id);
-    persist(); closeSheet(); toast('Wine deleted'); this.render();
   },
 
   // REPORT
